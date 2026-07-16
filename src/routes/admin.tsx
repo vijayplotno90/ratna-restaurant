@@ -9,6 +9,7 @@ import {
   Settings as SettingsIcon,
   LogOut,
   Store,
+  Crown,
   Menu,
   X,
 } from "lucide-react";
@@ -32,6 +33,9 @@ function AdminLayout() {
   const nav = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [ownerSession, setOwnerSession] = useState(false);
+
+  useEffect(() => { setOwnerSession(document.cookie.split(";").some(item => item.trim() === "ratna_owner_session_v1=1")); }, []);
 
   useEffect(() => {
     if (auth.hydrated && !auth.unlocked && pathname !== "/admin/login") {
@@ -73,6 +77,7 @@ function AdminLayout() {
             auth.lock();
             nav({ to: "/admin/login" });
           }}
+          ownerSession={ownerSession}
         />
         <main className="flex-1 overflow-x-hidden">
           <Outlet />
@@ -86,10 +91,12 @@ function Sidebar({
   onLogout,
   mobileOpen,
   onNavigate,
+  ownerSession,
 }: {
   onLogout: () => void;
   mobileOpen: boolean;
   onNavigate: () => void;
+  ownerSession: boolean;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const r = useReservations();
@@ -152,6 +159,7 @@ function Sidebar({
         })}
       </nav>
       <div className="mt-auto border-t border-white/10 p-3">
+        {ownerSession && <Link to="/owner" className="mb-1 flex items-center gap-3 rounded-sm px-3 py-2 text-sm text-[var(--brass)] hover:bg-white/10"><Crown className="h-4 w-4" /> Owner Console</Link>}
         <Link
           to="/"
           className="mb-1 flex items-center gap-3 rounded-sm px-3 py-2 text-sm text-[var(--ivory)]/70 hover:bg-white/10"

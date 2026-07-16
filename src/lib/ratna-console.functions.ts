@@ -193,7 +193,7 @@ export const ratnaAddFestivalPlan = createServerFn({ method: "POST" })
   });
 
 const menuRequestInput = credentials.extend({
-  changeType: z.enum(["dish", "price", "availability", "offer", "special", "custom_dish", "website"]),
+  changeType: z.enum(["dish", "price", "availability", "offer", "special", "custom_dish", "website", "category"]),
   targetName: z.string().trim().min(2).max(160),
   summary: z.string().trim().min(8).max(600),
   payload: z.record(z.string(), z.unknown()).default({}),

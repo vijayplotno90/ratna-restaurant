@@ -126,11 +126,12 @@ const ago = (days: number, hour = 13) => {
   date.setHours(hour, 15, 0, 0);
   return date.getTime();
 };
+const minutesAgo = (minutes: number) => Date.now() - minutes * 60 * 1000;
 
 export const DEMO_ORDERS: Order[] = [
   {
     id: "demo-1008",
-    createdAt: ago(1, 20),
+    createdAt: minutesAgo(18),
     name: "Aarav Reddy",
     phone: "9876543210",
     mode: "delivery",
@@ -150,7 +151,7 @@ export const DEMO_ORDERS: Order[] = [
   },
   {
     id: "demo-1007",
-    createdAt: ago(2, 14),
+    createdAt: minutesAgo(42),
     name: "Meera Shah",
     phone: "9876543211",
     mode: "pickup",
@@ -167,7 +168,7 @@ export const DEMO_ORDERS: Order[] = [
   },
   {
     id: "demo-1006",
-    createdAt: ago(5, 19),
+    createdAt: minutesAgo(88),
     name: "Aarav Reddy",
     phone: "9876543210",
     mode: "delivery",
@@ -187,7 +188,7 @@ export const DEMO_ORDERS: Order[] = [
   },
   {
     id: "demo-1005",
-    createdAt: ago(9, 13),
+    createdAt: minutesAgo(137),
     name: "Nikhil Varma",
     phone: "9876543212",
     mode: "pickup",
@@ -353,9 +354,15 @@ export const DEMO_AUTOMATIONS: Automation[] = [
 ];
 
 export const DEMO_ENQUIRIES: Enquiry[] = [
-  { id: "enq-demo-1", createdAt: ago(0, 11), name: "Kavya Reddy", phone: "9876543230", message: "Need a family table for 12 on Saturday at 8 PM. Do you have a non-veg set menu?", status: "unread" },
-  { id: "enq-demo-2", createdAt: ago(1, 16), name: "Suresh Kumar", phone: "9876543231", message: "Please share the corporate lunch package for 35 people at our ECIL office.", status: "read" },
-  { id: "enq-demo-3", createdAt: ago(2, 18), name: "Farah Ali", phone: "9876543232", message: "Is the private dining area available for an anniversary dinner next Friday?", status: "replied" },
+  { id: "enq-demo-1", createdAt: minutesAgo(9), name: "Kavya Reddy", phone: "9876543230", message: "Need a family table for 12 on Saturday at 8 PM. Do you have a non-veg set menu?", status: "unread" },
+  { id: "enq-demo-2", createdAt: minutesAgo(56), name: "Suresh Kumar", phone: "9876543231", message: "Please share the corporate lunch package for 35 people at our ECIL office.", status: "read" },
+  { id: "enq-demo-3", createdAt: minutesAgo(123), name: "Farah Ali", phone: "9876543232", message: "Is the private dining area available for an anniversary dinner next Friday?", status: "replied" },
+];
+
+export const DEMO_RESERVATIONS: Reservation[] = [
+  { id: "res-demo-1", createdAt: minutesAgo(14), name: "Priya Nair", phone: "9876543240", date: new Date().toISOString().slice(0, 10), time: "8:00 PM", guests: 6, hall: "deluxe", hallName: "Ratna Deluxe", seating: "Family table", status: "pending" },
+  { id: "res-demo-2", createdAt: minutesAgo(67), name: "Rohit Gupta", phone: "9876543241", date: new Date().toISOString().slice(0, 10), time: "7:30 PM", guests: 4, hall: "ratna", hallName: "Ratna", seating: "Window side", status: "confirmed" },
+  { id: "res-demo-3", createdAt: minutesAgo(158), name: "Ayesha Khan", phone: "9876543242", date: new Date().toISOString().slice(0, 10), time: "9:00 PM", guests: 10, hall: "deluxe", hallName: "Ratna Deluxe", seating: "Celebration table", notes: "Anniversary cake", status: "pending" },
 ];
 
 // ---------- generic helpers ----------
@@ -444,7 +451,7 @@ export function priceOverrideFor(itemId: string): number | undefined {
 
 // ---------- hooks ----------
 export function useReservations() {
-  const [list, setList, hydrated] = useStored<Reservation[]>(K.reservations, []);
+  const [list, setList, hydrated] = useStored<Reservation[]>(K.reservations, DEMO_RESERVATIONS);
   return {
     list,
     hydrated,

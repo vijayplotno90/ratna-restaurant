@@ -22,7 +22,7 @@ function AdminOverview() {
     ...r.list.slice(0, 6).map((x) => ({ kind: "res" as const, id: x.id, when: x.createdAt, text: `${x.name} · ${x.guests} guests · ${x.date} ${x.time}` })),
     ...o.list.slice(0, 6).map((x) => ({ kind: "ord" as const, id: x.id, when: x.createdAt, text: `${x.name} · ₹${x.total} · ${x.mode}` })),
     ...e.list.slice(0, 6).map((x) => ({ kind: "enq" as const, id: x.id, when: x.createdAt, text: `${x.name} · ${x.message.slice(0, 60)}` })),
-  ].sort((a, b) => b.when - a.when).slice(0, 10);
+  ].filter((item) => item.when >= Date.now() - 24 * 60 * 60 * 1000).sort((a, b) => b.when - a.when).slice(0, 10);
 
   return (
     <div className="mx-auto max-w-6xl px-8 py-10">
@@ -77,7 +77,7 @@ function timeAgo(ts: number) {
   if (s < 60) return `${s}s ago`;
   if (s < 3600) return `${Math.floor(s / 60)}m ago`;
   if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-  return `${Math.floor(s / 86400)}d ago`;
+  return new Date(ts).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
 }
 
 export function Header({ title, sub }: { title: string; sub?: string }) {
