@@ -51,7 +51,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
         .select("phone, email, birthday, anniversary, preferences, notes, marketing_consent, gender, relationship_status, important_people, important_dates"),
       db
         .from("ratna_campaigns")
-        .select("id, name, audience, trigger_type, schedule_label, message, enabled, last_run_at")
+        .select("id, name, audience, trigger_type, schedule_label, message, enabled, last_run_at, icon")
         .order("created_at"),
       db.from("ratna_order_items").select("order_id, item_name, quantity, unit_price"),
       db
@@ -100,6 +100,7 @@ const campaignInput = credentials.extend({
   scheduleLabel: z.string().trim().min(3).max(120),
   message: z.string().trim().min(10).max(1000),
   enabled: z.boolean(),
+  icon: z.string().trim().min(1).max(12).optional(),
 });
 
 export const ratnaUpdateCampaign = createServerFn({ method: "POST" })
@@ -110,10 +111,25 @@ export const ratnaUpdateCampaign = createServerFn({ method: "POST" })
     const db = getRatnaAdminClient();
     const { error } = await db.from("ratna_campaigns").update({
       name: data.name, audience: data.audience, trigger_type: data.triggerType,
-      schedule_label: data.scheduleLabel, message: data.message, enabled: data.enabled,
+      schedule_label: data.scheduleLabel, message: data.message, enabled: data.enabled, icon: data.icon ?? "📣",
     }).eq("id", data.id);
     if (error) throw new Error(error.message);
     await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "campaign_updated", metadata: { campaign_id: data.id, name: data.name } });
+    return { ok: true };
+  });
+
+export const ratnaCreateCampaign = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => campaignInput.omit({ id: true }).parse(input))
+  .handler(async ({ data }) => {
+    const user = await authenticate(data, "owner");
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { error } = await db.from("ratna_campaigns").insert({
+      name: data.name, audience: data.audience, trigger_type: data.triggerType,
+      schedule_label: data.scheduleLabel, message: data.message, enabled: data.enabled, icon: data.icon ?? "📣",
+    });
+    if (error) throw new Error(error.message);
+    await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "campaign_created", metadata: { name: data.name } });
     return { ok: true };
   });
 
