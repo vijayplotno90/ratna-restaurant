@@ -96,6 +96,21 @@ const K = {
   unlocked: "ratna_admin_unlocked_v1",
 };
 
+// The staff session is deliberately separate from the operational demo data.
+// Keeping a small same-site cookie means a verified login survives the route
+// transition even if the browser delays localStorage hydration.
+const ADMIN_SESSION_COOKIE = "ratna_admin_session_v1";
+
+function hasAdminSession() {
+  if (typeof document === "undefined") return false;
+  return document.cookie.split(";").some((item) => item.trim() === `${ADMIN_SESSION_COOKIE}=1`);
+}
+
+function setAdminSession(active: boolean) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${ADMIN_SESSION_COOKIE}=${active ? "1" : ""}; Path=/; Max-Age=${active ? 60 * 60 * 8 : 0}; SameSite=Lax`;
+}
+
 const DEFAULT_SETTINGS: Settings = {
   kitchenPaused: false,
   deliveryRadiusKm: 7,
@@ -502,15 +517,25 @@ export function useSettings() {
 }
 export function useAdminAuth() {
   const [unlocked, setUnlocked, hydrated] = useStored<boolean>(K.unlocked, false);
+  const sessionUnlocked = hasAdminSession();
   return {
-    unlocked,
+    unlocked: unlocked || sessionUnlocked,
     hydrated,
     unlock: (pass: string) => {
       const ok = pass === getSettings().adminPass;
-      if (ok) setUnlocked(true);
+      if (ok) {
+        setAdminSession(true);
+        setUnlocked(true);
+      }
       return ok;
     },
-    unlockVerified: () => setUnlocked(true),
-    lock: () => setUnlocked(false),
+    unlockVerified: () => {
+      setAdminSession(true);
+      setUnlocked(true);
+    },
+    lock: () => {
+      setAdminSession(false);
+      setUnlocked(false);
+    },
   };
 }

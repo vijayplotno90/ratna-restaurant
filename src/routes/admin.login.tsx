@@ -30,7 +30,7 @@ function AdminLogin() {
       await ratnaAdminLogin({ data: { userId, password } });
       auth.unlockVerified();
       toast.success("Welcome back");
-      nav({ to: "/admin/" });
+      window.location.assign("/admin/");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to sign in");
     } finally {
