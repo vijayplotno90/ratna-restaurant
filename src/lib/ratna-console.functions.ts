@@ -19,7 +19,7 @@ async function authenticate(
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Invalid user ID or password");
-  if (minimumRole === "owner" && data.role !== "owner") throw new Error("Owner access required");
+  if (minimumRole === "owner" && (data as TeamUser).role !== "owner") throw new Error("Owner access required");
   return data as TeamUser;
 }
 
@@ -37,7 +37,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
     const user = await authenticate(data, "owner");
     const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
     const db = getRatnaAdminClient();
-    const [ordersResult, profilesResult, campaignsResult] = await Promise.all([
+    const [ordersResult, profilesResult, campaignsResult, itemsResult, auditResult, messagesResult] = await Promise.all([
       db
         .from("ratna_orders")
         .select(
@@ -52,14 +52,31 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
         .from("ratna_campaigns")
         .select("id, name, audience, trigger_type, schedule_label, message, enabled, last_run_at")
         .order("created_at"),
+      db.from("ratna_order_items").select("order_id, item_name, quantity, unit_price"),
+      db
+        .from("ratna_console_audit")
+        .select("id, actor_user_id, action, metadata, created_at")
+        .order("created_at", { ascending: false })
+        .limit(100),
+      db
+        .from("ratna_customer_messages")
+        .select("id, audience, channel, body, sent_at, created_at")
+        .order("created_at", { ascending: false })
+        .limit(100),
     ]);
     if (ordersResult.error) throw new Error(ordersResult.error.message);
     if (profilesResult.error) throw new Error(profilesResult.error.message);
     if (campaignsResult.error) throw new Error(campaignsResult.error.message);
+    if (itemsResult.error) throw new Error(itemsResult.error.message);
+    if (auditResult.error) throw new Error(auditResult.error.message);
+    if (messagesResult.error) throw new Error(messagesResult.error.message);
     return {
       user,
       orders: ordersResult.data ?? [],
       profiles: profilesResult.data ?? [],
       campaigns: campaignsResult.data ?? [],
+      items: itemsResult.data ?? [],
+      audit: auditResult.data ?? [],
+      messages: messagesResult.data ?? [],
     };
   });

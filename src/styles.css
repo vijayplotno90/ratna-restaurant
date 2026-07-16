@@ -202,6 +202,31 @@
     var(--ivory);
 }
 
+/* Ratna owner console: the same warm ivory, brass and emerald language as the guest site. */
+.owner-card {
+  border: 1px solid color-mix(in oklab, var(--brass) 30%, transparent);
+  border-radius: 0.18rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1.25rem;
+  box-shadow: 0 1px 0 rgba(16, 71, 55, 0.03);
+}
+.pill-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid color-mix(in oklab, var(--emerald) 55%, transparent);
+  border-radius: 9999px;
+  padding: 0.55rem 0.85rem;
+  color: var(--emerald-deep);
+  background: rgba(255,255,255,0.72);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.pill-action:hover { background: var(--emerald-deep); color: var(--ivory); }
+
 .royal-page-hero {
   position: relative;
   isolation: isolate;
