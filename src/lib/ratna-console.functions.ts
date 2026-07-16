@@ -66,7 +66,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
       db.from("ratna_web_leads").select("id, lead_type, placement, page_path, created_at").order("created_at", { ascending: false }).limit(500),
       db.from("ratna_menu_change_requests").select("id, requested_by, change_type, target_name, summary, payload, status, owner_comment, requested_at, reviewed_at").order("requested_at", { ascending: false }).limit(100),
       db.from("ratna_campaign_deliveries").select("id, campaign_id, recipient_phone, channel, status, body, created_at, sent_at").order("created_at", { ascending: false }).limit(200),
-      db.from("ratna_festival_calendar").select("id, category, festival_name, date_2026, date_2027, hyderabad_context, lunar_date").order("date_2026"),
+      db.from("ratna_festival_calendar").select("id, category, festival_name, date_2026, date_2027, hyderabad_context, lunar_date, message_template, delivery_time, channels, active").order("date_2026"),
     ]);
     if (ordersResult.error) throw new Error(ordersResult.error.message);
     if (profilesResult.error) throw new Error(profilesResult.error.message);
@@ -134,4 +134,22 @@ export const ratnaRunCampaign = createServerFn({ method: "POST" })
     await db.from("ratna_campaigns").update({ last_run_at: new Date().toISOString() }).eq("id", campaign.id);
     await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "campaign_queued", metadata: { campaign_id: campaign.id, recipients: recipients.length } });
     return { queued: recipients.length };
+  });
+
+export const ratnaUpdateFestivalPlan = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => credentials.extend({
+    id: z.string().uuid(), messageTemplate: z.string().trim().min(10).max(1000),
+    deliveryTime: z.string().regex(/^\d{2}:\d{2}$/),
+    channels: z.array(z.enum(["in_app", "whatsapp", "sms"])).min(1), active: z.boolean(),
+  }).parse(input))
+  .handler(async ({ data }) => {
+    const user = await authenticate(data, "owner");
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { error } = await db.from("ratna_festival_calendar").update({
+      message_template: data.messageTemplate, delivery_time: data.deliveryTime, channels: data.channels, active: data.active,
+    }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "festival_plan_updated", metadata: { festival_id: data.id } });
+    return { ok: true };
   });
