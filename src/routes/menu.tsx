@@ -35,9 +35,9 @@ function MenuPage() {
   const current = categories.find((c) => c.id === active);
 
   return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
-      <header className="border-b border-[var(--brass)]/20 bg-[var(--emerald-deep)] px-6 py-14 text-[var(--ivory)] md:px-10">
+      <header className="royal-page-hero px-6 py-14 text-[var(--ivory)] md:px-10">
         <div className="mx-auto max-w-7xl text-center">
           <p className="eyebrow text-[var(--brass)]"><span className="ornament">Established 2004</span></p>
           <h1 className="mt-4 font-serif text-5xl italic md:text-7xl">Our Menu</h1>

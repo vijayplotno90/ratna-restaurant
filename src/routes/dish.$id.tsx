@@ -52,7 +52,7 @@ function DishPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
       <div className="mx-auto max-w-7xl px-4 pt-6 md:px-10">
         <button onClick={() => history.back()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-[var(--emerald)]">

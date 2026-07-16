@@ -38,7 +38,7 @@ function ReservePage() {
   };
 
   if (step === "done") return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
         <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-[var(--emerald)]/10"><CheckCircle2 className="h-12 w-12 text-[var(--emerald)]" /></div>
@@ -51,9 +51,9 @@ function ReservePage() {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
-      <header className="bg-[var(--emerald-deep)] px-6 py-16 text-center text-[var(--ivory)]">
+      <header className="royal-page-hero px-6 py-16 text-center text-[var(--ivory)]">
         <p className="eyebrow text-[var(--brass)]"><span className="ornament">Table for you</span></p>
         <h1 className="mt-4 font-serif text-5xl italic md:text-7xl">Reserve a Table</h1>
         <p className="mx-auto mt-4 max-w-lg text-[var(--ivory)]/75">Two dining rooms under one roof — pick the room that fits your evening.</p>

@@ -15,7 +15,7 @@ function CartPage() {
   const service = subtotal > 0 ? 30 : 0;
   const total = subtotal + gst + service;
   return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
       <div className="mx-auto max-w-5xl px-4 py-12 md:px-8">
         <p className="eyebrow text-[var(--emerald)]">Your table</p>

@@ -16,9 +16,9 @@ export const Route = createFileRoute("/visit")({
 
 function VisitPage() {
   return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
-      <header className="bg-[var(--emerald-deep)] px-6 py-16 text-center text-[var(--ivory)]">
+      <header className="royal-page-hero px-6 py-16 text-center text-[var(--ivory)]">
         <p className="eyebrow text-[var(--brass)]"><span className="ornament">Come dine with us</span></p>
         <h1 className="mt-4 font-serif text-5xl italic md:text-7xl">Visit Us</h1>
         <p className="mx-auto mt-4 max-w-xl text-[var(--ivory)]/80">One address, two dining halls, two decades. Open every day, from noon until late.</p>

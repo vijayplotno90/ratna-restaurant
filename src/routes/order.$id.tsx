@@ -15,7 +15,7 @@ function OrderPage() {
   const order = list.find((item) => item.id === id);
   const stage = order?.status === "new" ? "Order received" : order?.status === "preparing" ? "Being prepared" : order?.status === "ready" ? "Ready for pickup" : order?.status === "out" ? "Out for delivery" : order?.status === "delivered" ? "Delivered" : "Order confirmed";
   return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
       <div className="mx-auto max-w-xl px-4 py-20 text-center">
         <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-[var(--emerald)]/10">

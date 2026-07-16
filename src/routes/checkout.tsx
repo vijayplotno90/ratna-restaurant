@@ -49,7 +49,7 @@ function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-[var(--ivory)]">
+      <div className="public-page min-h-screen">
         <SiteNav />
         <div className="mx-auto max-w-md px-4 py-20 text-center">
           <h1 className="font-serif text-3xl italic">Your order is empty</h1>
@@ -81,7 +81,7 @@ function CheckoutPage() {
   };
 
   if (busy) return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
       <div className="grid min-h-[60vh] place-items-center px-4">
         <div className="text-center">
@@ -93,7 +93,7 @@ function CheckoutPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
       <form onSubmit={submit} className="mx-auto grid max-w-5xl gap-8 px-4 py-12 md:px-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">

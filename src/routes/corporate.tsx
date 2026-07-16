@@ -52,7 +52,7 @@ function CorporatePage() {
   };
 
   if (done) return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
         <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-[var(--emerald)]/10"><CheckCircle2 className="h-12 w-12 text-[var(--emerald)]" /></div>
@@ -65,11 +65,11 @@ function CorporatePage() {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--ivory)]">
+    <div className="public-page min-h-screen">
       <SiteNav />
-      <section className="relative isolate overflow-hidden bg-[var(--emerald-deep)] text-[var(--ivory)]">
+      <section className="royal-page-hero relative isolate overflow-hidden text-[var(--ivory)]">
         <img src={teamDinner} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--emerald-deep)]/80 to-[var(--emerald-deep)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--emerald)]/80 to-[var(--emerald-deep)]" />
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center">
           <p className="eyebrow text-[var(--brass)]"><span className="ornament">For teams · For companies</span></p>
           <h1 className="mt-4 font-serif text-5xl italic md:text-7xl">The corporate table</h1>
