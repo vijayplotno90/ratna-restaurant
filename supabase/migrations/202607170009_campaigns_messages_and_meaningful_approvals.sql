@@ -23,8 +23,8 @@ on conflict (id) do nothing;
 
 update public.ratna_menu_change_requests
 set target_name = 'Chicken Dum Biryani',
-  summary = 'Weekday lunch price decrease: show ₹250 struck through and ₹199 as the limited-time offer price (12 PM–4 PM).',
-  payload = '{"old_price":250,"offer_price":199,"display_strike_price":true,"validity":"Weekdays · 12 PM–4 PM"}'::jsonb
+  summary = '10% off Chicken Dum Biryani.',
+  payload = '{"old_price":250,"offer_price":225,"display_strike_price":true,"validity":"10% off"}'::jsonb
 where id = 'c0000000-0000-4000-8000-000000000001';
 
 update public.ratna_menu_change_requests
