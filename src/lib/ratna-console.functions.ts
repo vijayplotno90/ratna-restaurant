@@ -37,7 +37,8 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
     const user = await authenticate(data, "owner");
     const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
     const db = getRatnaAdminClient();
-    const [ordersResult, profilesResult, campaignsResult, itemsResult, auditResult, messagesResult, leadsResult, approvalsResult, deliveriesResult, festivalsResult] = await Promise.all([
+    try { await db.rpc("ratna_prune_expired_custom_festivals"); } catch { /* migration may not be applied yet */ }
+    const [ordersResult, profilesResult, campaignsResult, itemsResult, auditResult, messagesResult, leadsResult, approvalsResult, deliveriesResult, festivalsResult, customFestivalsResult] = await Promise.all([
       db
         .from("ratna_orders")
         .select(
@@ -67,6 +68,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
       db.from("ratna_menu_change_requests").select("id, requested_by, change_type, target_name, summary, payload, status, owner_comment, requested_at, reviewed_at").order("requested_at", { ascending: false }).limit(100),
       db.from("ratna_campaign_deliveries").select("id, campaign_id, recipient_phone, channel, status, body, created_at, sent_at").order("created_at", { ascending: false }).limit(200),
       db.from("ratna_festival_calendar").select("id, category, festival_name, date_2026, date_2027, hyderabad_context, lunar_date, message_template, delivery_time, channels, active").order("date_2026"),
+      db.from("ratna_custom_festival_plans").select("id, festival_name, scheduled_date, message_template, delivery_time, channels, active, created_at").order("scheduled_date"),
     ]);
     if (ordersResult.error) throw new Error(ordersResult.error.message);
     if (profilesResult.error) throw new Error(profilesResult.error.message);
@@ -86,6 +88,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
       approvals: approvalsResult.error ? [] : approvalsResult.data ?? [],
       deliveries: deliveriesResult.error ? [] : deliveriesResult.data ?? [],
       festivals: festivalsResult.error ? [] : festivalsResult.data ?? [],
+      customFestivals: customFestivalsResult.error ? [] : customFestivalsResult.data ?? [],
     };
   });
 
@@ -151,5 +154,24 @@ export const ratnaUpdateFestivalPlan = createServerFn({ method: "POST" })
     }).eq("id", data.id);
     if (error) throw new Error(error.message);
     await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "festival_plan_updated", metadata: { festival_id: data.id } });
+    return { ok: true };
+  });
+
+export const ratnaAddFestivalPlan = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => credentials.extend({
+    festivalName: z.string().trim().min(3).max(120), scheduledDate: z.string().date(),
+    messageTemplate: z.string().trim().min(10).max(1000), deliveryTime: z.string().regex(/^\d{2}:\d{2}$/),
+    channels: z.array(z.enum(["in_app", "whatsapp", "sms"])).min(1), active: z.boolean(),
+  }).parse(input))
+  .handler(async ({ data }) => {
+    const user = await authenticate(data, "owner");
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { error } = await db.from("ratna_custom_festival_plans").insert({
+      festival_name: data.festivalName, scheduled_date: data.scheduledDate, message_template: data.messageTemplate,
+      delivery_time: data.deliveryTime, channels: data.channels, active: data.active, created_by: user.user_id,
+    });
+    if (error) throw new Error(error.message);
+    await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "custom_festival_added", metadata: { festival: data.festivalName, date: data.scheduledDate } });
     return { ok: true };
   });
