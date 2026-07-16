@@ -35,6 +35,7 @@ export function SiteNav() {
             <NavLink to="/reserve">Reserve</NavLink>
             <NavLink to="/corporate">Corporate</NavLink>
             <NavLink to="/visit">Visit</NavLink>
+            <NavLink to="/account">My Ratna</NavLink>
           </div>
 
           <div className="flex items-center gap-2">
@@ -58,6 +59,7 @@ export function SiteNav() {
               <MobileLink to="/reserve" onClick={() => setOpen(false)}>Reserve a Table</MobileLink>
               <MobileLink to="/corporate" onClick={() => setOpen(false)}>Corporate & Team Lunches</MobileLink>
               <MobileLink to="/visit" onClick={() => setOpen(false)}>Visit Us</MobileLink>
+              <MobileLink to="/account" onClick={() => setOpen(false)}>My Ratna</MobileLink>
             </div>
           </div>
         )}

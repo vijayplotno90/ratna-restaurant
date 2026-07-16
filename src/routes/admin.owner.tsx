@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Download, FileText, ReceiptText, UsersRound, WalletCards } from "lucide-react";
 import { useMemo, useState } from "react";
+import JSZip from "jszip";
 import { useOrders, type Order } from "@/lib/admin-store";
 import { Header } from "./admin.index";
 
@@ -10,8 +11,8 @@ const rupees = (amount: number) => `₹${amount.toLocaleString("en-IN", { maximu
 const csvCell = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
 const makeCsv = (columns: string[], rows: unknown[][]) => [columns.map(csvCell).join(","), ...rows.map((row) => row.map(csvCell).join(","))].join("\n");
 
-function download(filename: string, contents: string) {
-  const blob = new Blob([contents], { type: "text/csv;charset=utf-8" });
+function download(filename: string, contents: BlobPart, type = "text/csv;charset=utf-8") {
+  const blob = new Blob([contents], { type });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
@@ -38,24 +39,35 @@ function OwnerPage() {
   const gst = paidOrders.reduce((sum, order) => sum + order.gst, 0);
   const averageBill = paidOrders.length ? sales / paidOrders.length : 0;
 
-  const salesRegister = () => download("ratna-sales-register.csv", makeCsv(
+  const salesRegisterCsv = () => makeCsv(
     ["Invoice / Order", "Date", "Customer", "Phone", "Mode", "Payment", "Subtotal", "Delivery", "GST", "Total", "Status"],
     paidOrders.map((o) => [o.id.toUpperCase(), new Date(o.createdAt).toLocaleString("en-IN"), o.name, o.phone, o.mode, o.pay, o.subtotal, o.delivery, o.gst, o.total, o.status]),
-  ));
-  const gstReport = () => download("ratna-gst-summary.csv", makeCsv(
+  );
+  const gstReportCsv = () => makeCsv(
     ["Period", "Completed orders", "Taxable sales", "GST collected", "Gross sales"],
     [["All recorded orders", paidOrders.length, paidOrders.reduce((sum, o) => sum + o.subtotal + o.delivery, 0), gst, sales]],
-  ));
-  const customerLedger = () => download("ratna-customer-ledger.csv", makeCsv(
+  );
+  const customerLedgerCsv = () => makeCsv(
     ["Customer", "Phone", "Orders", "Lifetime spend", "Last order"],
     customers.map((c) => [c.name, c.phone, c.orders.length, c.spent, new Date(c.lastOrder.createdAt).toLocaleString("en-IN")]),
-  ));
+  );
+  const salesRegister = () => download("ratna-sales-register.csv", salesRegisterCsv());
+  const gstReport = () => download("ratna-gst-summary.csv", gstReportCsv());
+  const customerLedger = () => download("ratna-customer-ledger.csv", customerLedgerCsv());
+  const caBundle = async () => {
+    const zip = new JSZip();
+    zip.file("ratna-sales-register.csv", salesRegisterCsv());
+    zip.file("ratna-gst-summary.csv", gstReportCsv());
+    zip.file("ratna-customer-ledger.csv", customerLedgerCsv());
+    zip.file("README.txt", "Ratna Deluxe CA export bundle\n\nIncludes all recorded non-cancelled orders, a GST summary, and a customer ledger. Generated: " + new Date().toLocaleString("en-IN"));
+    download(`ratna-ca-export-${new Date().toISOString().slice(0, 10)}.zip`, await zip.generateAsync({ type: "blob" }), "application/zip");
+  };
 
   return <div className="mx-auto max-w-6xl px-8 py-10">
     <Header title="Owner & Finance" sub="A clean operating view for customers, receipts and accountant-ready records." />
     <section className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4"><Stat icon={WalletCards} label="Recorded sales" value={rupees(sales)} /><Stat icon={ReceiptText} label="GST collected" value={rupees(gst)} /><Stat icon={UsersRound} label="Known customers" value={customers.length.toString()} /><Stat icon={FileText} label="Average bill" value={rupees(averageBill)} /></section>
     <section className="mt-8 rounded-sm border border-[var(--brass)]/25 bg-white p-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="eyebrow text-[var(--brass)]">CA-ready exports</p><h2 className="mt-1 text-2xl italic">Everything from one place</h2><p className="mt-1 max-w-2xl text-sm text-muted-foreground">Download the sales register, GST summary and customer ledger separately, then share them with your CA. Every export reflects recorded non-cancelled orders.</p></div><div className="flex flex-wrap gap-2"><ExportButton label="Sales register" onClick={salesRegister} /><ExportButton label="GST summary" onClick={gstReport} /><ExportButton label="Customer ledger" onClick={customerLedger} /></div></div>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="eyebrow text-[var(--brass)]">CA-ready exports</p><h2 className="mt-1 text-2xl italic">Everything from one place</h2><p className="mt-1 max-w-2xl text-sm text-muted-foreground">Download the sales register, GST summary and customer ledger separately, or send the complete ZIP bundle straight to your CA. Every export reflects recorded non-cancelled orders.</p></div><div className="flex flex-wrap gap-2"><ExportButton label="Download CA ZIP" onClick={() => void caBundle()} /><ExportButton label="Sales register" onClick={salesRegister} /><ExportButton label="GST summary" onClick={gstReport} /><ExportButton label="Customer ledger" onClick={customerLedger} /></div></div>
     </section>
     <section className="mt-8 rounded-sm border border-[var(--brass)]/25 bg-white p-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><p className="eyebrow text-[var(--brass)]">Customer relationships</p><h2 className="mt-1 text-2xl italic">Guests who come back</h2></div><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or phone" className="w-full rounded-sm border border-border px-3 py-2 text-sm sm:w-64" /></div>
