@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VisitRouteImport } from './routes/visit'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReserveRouteImport } from './routes/reserve'
+import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as CorporateRouteImport } from './routes/corporate'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -43,6 +44,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ReserveRoute = ReserveRouteImport.update({
   id: '/reserve',
   path: '/reserve',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerRoute = OwnerRouteImport.update({
+  id: '/owner',
+  path: '/owner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuRoute = MenuRouteImport.update({
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/corporate': typeof CorporateRoute
   '/menu': typeof MenuRoute
+  '/owner': typeof OwnerRoute
   '/reserve': typeof ReserveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/corporate': typeof CorporateRoute
   '/menu': typeof MenuRoute
+  '/owner': typeof OwnerRoute
   '/reserve': typeof ReserveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/corporate': typeof CorporateRoute
   '/menu': typeof MenuRoute
+  '/owner': typeof OwnerRoute
   '/reserve': typeof ReserveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/corporate'
     | '/menu'
+    | '/owner'
     | '/reserve'
     | '/sitemap.xml'
     | '/visit'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/corporate'
     | '/menu'
+    | '/owner'
     | '/reserve'
     | '/sitemap.xml'
     | '/visit'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/corporate'
     | '/menu'
+    | '/owner'
     | '/reserve'
     | '/sitemap.xml'
     | '/visit'
@@ -273,6 +285,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   CorporateRoute: typeof CorporateRoute
   MenuRoute: typeof MenuRoute
+  OwnerRoute: typeof OwnerRoute
   ReserveRoute: typeof ReserveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VisitRoute: typeof VisitRoute
@@ -301,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: '/reserve'
       fullPath: '/reserve'
       preLoaderRoute: typeof ReserveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner': {
+      id: '/owner'
+      path: '/owner'
+      fullPath: '/owner'
+      preLoaderRoute: typeof OwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/menu': {
@@ -457,6 +477,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   CorporateRoute: CorporateRoute,
   MenuRoute: MenuRoute,
+  OwnerRoute: OwnerRoute,
   ReserveRoute: ReserveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VisitRoute: VisitRoute,
