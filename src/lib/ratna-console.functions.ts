@@ -47,7 +47,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
         .limit(500),
       db
         .from("ratna_customer_profiles")
-        .select("phone, email, birthday, anniversary, preferences, notes, marketing_consent"),
+        .select("phone, email, birthday, anniversary, preferences, notes, marketing_consent, gender, relationship_status, important_people, important_dates"),
       db
         .from("ratna_campaigns")
         .select("id, name, audience, trigger_type, schedule_label, message, enabled, last_run_at")
@@ -85,4 +85,51 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
       approvals: approvalsResult.error ? [] : approvalsResult.data ?? [],
       deliveries: deliveriesResult.error ? [] : deliveriesResult.data ?? [],
     };
+  });
+
+const campaignInput = credentials.extend({
+  id: z.string().uuid(),
+  name: z.string().trim().min(3).max(120),
+  audience: z.enum(["all", "new", "regular", "at_risk", "vip"]),
+  triggerType: z.enum(["scheduled", "birthday", "anniversary", "festival", "manual"]),
+  scheduleLabel: z.string().trim().min(3).max(120),
+  message: z.string().trim().min(10).max(1000),
+  enabled: z.boolean(),
+});
+
+export const ratnaUpdateCampaign = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => campaignInput.parse(input))
+  .handler(async ({ data }) => {
+    const user = await authenticate(data, "owner");
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { error } = await db.from("ratna_campaigns").update({
+      name: data.name, audience: data.audience, trigger_type: data.triggerType,
+      schedule_label: data.scheduleLabel, message: data.message, enabled: data.enabled,
+    }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "campaign_updated", metadata: { campaign_id: data.id, name: data.name } });
+    return { ok: true };
+  });
+
+export const ratnaRunCampaign = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => credentials.extend({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => {
+    const user = await authenticate(data, "owner");
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { data: campaign, error } = await db.from("ratna_campaigns").select("id, name, audience, message").eq("id", data.id).maybeSingle();
+    if (error || !campaign) throw new Error(error?.message ?? "Campaign not found");
+    const { data: profiles } = await db.from("ratna_customer_profiles").select("phone, marketing_consent").eq("marketing_consent", true);
+    const recipients = profiles ?? [];
+    if (recipients.length) {
+      const { error: insertError } = await db.from("ratna_campaign_deliveries").insert(recipients.map((profile) => ({
+        campaign_id: campaign.id, recipient_phone: profile.phone, channel: "whatsapp", status: "queued",
+        body: campaign.message, created_at: new Date().toISOString(),
+      })));
+      if (insertError) throw new Error(insertError.message);
+    }
+    await db.from("ratna_campaigns").update({ last_run_at: new Date().toISOString() }).eq("id", campaign.id);
+    await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "campaign_queued", metadata: { campaign_id: campaign.id, recipients: recipients.length } });
+    return { queued: recipients.length };
   });
