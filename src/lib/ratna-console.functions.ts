@@ -37,7 +37,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
     const user = await authenticate(data, "owner");
     const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
     const db = getRatnaAdminClient();
-    const [ordersResult, profilesResult, campaignsResult, itemsResult, auditResult, messagesResult, leadsResult, approvalsResult, deliveriesResult] = await Promise.all([
+    const [ordersResult, profilesResult, campaignsResult, itemsResult, auditResult, messagesResult, leadsResult, approvalsResult, deliveriesResult, festivalsResult] = await Promise.all([
       db
         .from("ratna_orders")
         .select(
@@ -66,6 +66,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
       db.from("ratna_web_leads").select("id, lead_type, placement, page_path, created_at").order("created_at", { ascending: false }).limit(500),
       db.from("ratna_menu_change_requests").select("id, requested_by, change_type, target_name, summary, payload, status, owner_comment, requested_at, reviewed_at").order("requested_at", { ascending: false }).limit(100),
       db.from("ratna_campaign_deliveries").select("id, campaign_id, recipient_phone, channel, status, body, created_at, sent_at").order("created_at", { ascending: false }).limit(200),
+      db.from("ratna_festival_calendar").select("id, category, festival_name, date_2026, date_2027, hyderabad_context, lunar_date").order("date_2026"),
     ]);
     if (ordersResult.error) throw new Error(ordersResult.error.message);
     if (profilesResult.error) throw new Error(profilesResult.error.message);
@@ -84,6 +85,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
       leads: leadsResult.error ? [] : leadsResult.data ?? [],
       approvals: approvalsResult.error ? [] : approvalsResult.data ?? [],
       deliveries: deliveriesResult.error ? [] : deliveriesResult.data ?? [],
+      festivals: festivalsResult.error ? [] : festivalsResult.data ?? [],
     };
   });
 
