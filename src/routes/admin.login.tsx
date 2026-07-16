@@ -20,7 +20,7 @@ function AdminLogin() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (auth.hydrated && auth.unlocked) nav({ to: "/admin" });
+    if (auth.hydrated && auth.unlocked) nav({ to: "/admin/" });
   }, [auth.hydrated, auth.unlocked, nav]);
 
   const submit = async (event: React.FormEvent) => {
@@ -30,7 +30,7 @@ function AdminLogin() {
       await ratnaAdminLogin({ data: { userId, password } });
       auth.unlockVerified();
       toast.success("Welcome back");
-      nav({ to: "/admin" });
+      nav({ to: "/admin/" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to sign in");
     } finally {

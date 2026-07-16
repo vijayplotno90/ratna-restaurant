@@ -103,7 +103,7 @@ function Sidebar({
   const unreadEnq = e.list.filter((x) => x.status === "unread").length;
 
   const items = [
-    { to: "/admin", label: "Overview", icon: LayoutDashboard, badge: 0, exact: true },
+    { to: "/admin/", label: "Overview", icon: LayoutDashboard, badge: 0, exact: true },
     { to: "/admin/reservations", label: "Reservations", icon: CalendarCheck, badge: pendingRes },
     { to: "/admin/orders", label: "Orders & Delivery", icon: Bike, badge: liveOrders },
     { to: "/admin/menu", label: "Menu Manager", icon: UtensilsCrossed, badge: 0 },
