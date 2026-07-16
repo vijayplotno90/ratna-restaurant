@@ -37,7 +37,7 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
     const user = await authenticate(data, "owner");
     const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
     const db = getRatnaAdminClient();
-    const [ordersResult, profilesResult, campaignsResult, itemsResult, auditResult, messagesResult] = await Promise.all([
+    const [ordersResult, profilesResult, campaignsResult, itemsResult, auditResult, messagesResult, leadsResult, approvalsResult, deliveriesResult] = await Promise.all([
       db
         .from("ratna_orders")
         .select(
@@ -63,6 +63,9 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
         .select("id, audience, channel, body, sent_at, created_at")
         .order("created_at", { ascending: false })
         .limit(100),
+      db.from("ratna_web_leads").select("id, lead_type, placement, page_path, created_at").order("created_at", { ascending: false }).limit(500),
+      db.from("ratna_menu_change_requests").select("id, requested_by, change_type, target_name, summary, payload, status, owner_comment, requested_at, reviewed_at").order("requested_at", { ascending: false }).limit(100),
+      db.from("ratna_campaign_deliveries").select("id, campaign_id, recipient_phone, channel, status, body, created_at, sent_at").order("created_at", { ascending: false }).limit(200),
     ]);
     if (ordersResult.error) throw new Error(ordersResult.error.message);
     if (profilesResult.error) throw new Error(profilesResult.error.message);
@@ -78,5 +81,8 @@ export const ratnaOwnerOverview = createServerFn({ method: "POST" })
       items: itemsResult.data ?? [],
       audit: auditResult.data ?? [],
       messages: messagesResult.data ?? [],
+      leads: leadsResult.error ? [] : leadsResult.data ?? [],
+      approvals: approvalsResult.error ? [] : approvalsResult.data ?? [],
+      deliveries: deliveriesResult.error ? [] : deliveriesResult.data ?? [],
     };
   });
