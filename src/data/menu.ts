@@ -134,7 +134,7 @@ export function getItem(id: string) {
   return menuItems.find((m) => m.id === id);
 }
 
-// Real dish photography, uploaded to the Lovable CDN. Each menu item's `image`
+// Real dish photography bundled with this repository. Each menu item's `image`
 // field is a slug matching one of the JPG files under src/assets/dishes.
 import imgThali from "@/assets/dish-thali.jpg";
 import { photoBySlug } from "./dish-images";

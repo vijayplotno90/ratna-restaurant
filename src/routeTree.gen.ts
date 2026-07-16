@@ -13,7 +13,6 @@ import { Route as VisitRouteImport } from './routes/visit'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReserveRouteImport } from './routes/reserve'
 import { Route as MenuRouteImport } from './routes/menu'
-import { Route as McpRouteImport } from './routes/mcp'
 import { Route as CorporateRouteImport } from './routes/corporate'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
@@ -30,9 +29,6 @@ import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminMenuRouteImport } from './routes/admin.menu'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminEnquiriesRouteImport } from './routes/admin.enquiries'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 
 const VisitRoute = VisitRouteImport.update({
   id: '/visit',
@@ -52,11 +48,6 @@ const ReserveRoute = ReserveRouteImport.update({
 const MenuRoute = MenuRouteImport.update({
   id: '/menu',
   path: '/menu',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CorporateRoute = CorporateRouteImport.update({
@@ -139,24 +130,6 @@ const AdminEnquiriesRoute = AdminEnquiriesRouteImport.update({
   path: '/enquiries',
   getParentRoute: () => AdminRoute,
 } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotmcpChar93InvokeToolToolRoute =
-  Char91DotmcpChar93InvokeToolToolRouteImport.update({
-    id: '/.mcp/invoke-tool/$tool',
-    path: '/.mcp/invoke-tool/$tool',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -165,13 +138,10 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/corporate': typeof CorporateRoute
-  '/mcp': typeof McpRoute
   '/menu': typeof MenuRoute
   '/reserve': typeof ReserveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/menu': typeof AdminMenuRoute
@@ -182,7 +152,6 @@ export interface FileRoutesByFullPath {
   '/dish/$id': typeof DishIdRoute
   '/order/$id': typeof OrderIdRoute
   '/admin/': typeof AdminIndexRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -190,13 +159,10 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/corporate': typeof CorporateRoute
-  '/mcp': typeof McpRoute
   '/menu': typeof MenuRoute
   '/reserve': typeof ReserveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/menu': typeof AdminMenuRoute
@@ -207,7 +173,6 @@ export interface FileRoutesByTo {
   '/dish/$id': typeof DishIdRoute
   '/order/$id': typeof OrderIdRoute
   '/admin': typeof AdminIndexRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -217,13 +182,10 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/corporate': typeof CorporateRoute
-  '/mcp': typeof McpRoute
   '/menu': typeof MenuRoute
   '/reserve': typeof ReserveRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visit': typeof VisitRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/menu': typeof AdminMenuRoute
@@ -234,7 +196,6 @@ export interface FileRoutesById {
   '/dish/$id': typeof DishIdRoute
   '/order/$id': typeof OrderIdRoute
   '/admin/': typeof AdminIndexRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -245,13 +206,10 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/corporate'
-    | '/mcp'
     | '/menu'
     | '/reserve'
     | '/sitemap.xml'
     | '/visit'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
     | '/admin/enquiries'
     | '/admin/login'
     | '/admin/menu'
@@ -262,7 +220,6 @@ export interface FileRouteTypes {
     | '/dish/$id'
     | '/order/$id'
     | '/admin/'
-    | '/.mcp/invoke-tool/$tool'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -270,13 +227,10 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/corporate'
-    | '/mcp'
     | '/menu'
     | '/reserve'
     | '/sitemap.xml'
     | '/visit'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
     | '/admin/enquiries'
     | '/admin/login'
     | '/admin/menu'
@@ -287,7 +241,6 @@ export interface FileRouteTypes {
     | '/dish/$id'
     | '/order/$id'
     | '/admin'
-    | '/.mcp/invoke-tool/$tool'
   id:
     | '__root__'
     | '/'
@@ -296,13 +249,10 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/corporate'
-    | '/mcp'
     | '/menu'
     | '/reserve'
     | '/sitemap.xml'
     | '/visit'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
     | '/admin/enquiries'
     | '/admin/login'
     | '/admin/menu'
@@ -313,7 +263,6 @@ export interface FileRouteTypes {
     | '/dish/$id'
     | '/order/$id'
     | '/admin/'
-    | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -323,16 +272,12 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   CorporateRoute: typeof CorporateRoute
-  McpRoute: typeof McpRoute
   MenuRoute: typeof MenuRoute
   ReserveRoute: typeof ReserveRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VisitRoute: typeof VisitRoute
-  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
-  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   DishIdRoute: typeof DishIdRoute
   OrderIdRoute: typeof OrderIdRoute
-  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -363,13 +308,6 @@ declare module '@tanstack/react-router' {
       path: '/menu'
       fullPath: '/menu'
       preLoaderRoute: typeof MenuRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/corporate': {
@@ -484,27 +422,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEnquiriesRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/.mcp/list-tools': {
-      id: '/.mcp/list-tools'
-      path: '/.mcp/list-tools'
-      fullPath: '/.mcp/list-tools'
-      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -539,17 +456,12 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   CorporateRoute: CorporateRoute,
-  McpRoute: McpRoute,
   MenuRoute: MenuRoute,
   ReserveRoute: ReserveRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VisitRoute: VisitRoute,
-  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
-  Char91DotwellKnownChar93OauthProtectedResourceRoute:
-    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   DishIdRoute: DishIdRoute,
   OrderIdRoute: OrderIdRoute,
-  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

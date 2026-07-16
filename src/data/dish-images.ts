@@ -1,6 +1,6 @@
 // Auto-load every dish photo stored under src/assets/dishes/*.jpg.
 // Key is the filename slug (for example, "chicken-dum-biryani").
-const modules = import.meta.glob("@/assets/dishes/*.jpg", {
+const modules = import.meta.glob("../assets/dishes/*.jpg", {
   eager: true,
   import: "default",
 }) as Record<string, string>;
