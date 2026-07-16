@@ -100,7 +100,7 @@ const DEFAULT_SETTINGS: Settings = {
   kitchenPaused: false,
   deliveryRadiusKm: 7,
   hours: "12:00 PM – 11:30 PM · All 7 days",
-  adminPass: "ratna-admin",
+  adminPass: "0000",
 };
 
 // These are intentionally labelled demo records. They let a prospective Ratna

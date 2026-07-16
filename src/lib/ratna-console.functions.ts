@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const credentials = z.object({
   userId: z.string().trim().min(3).max(40),
-  password: z.string().min(10).max(100),
+  password: z.string().min(4).max(100),
 });
 
 type TeamUser = { id: string; user_id: string; name: string; role: "owner" | "admin" | "staff" };
