@@ -1,91 +1,34 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { RotateCcw, Search } from "lucide-react";
+import { Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { menuItems, categories, dishUrl } from "@/data/menu";
-import { useOverrides } from "@/lib/admin-store";
+import { ratnaSubmitMenuRequest } from "@/lib/ratna-console.functions";
 import { Header } from "./admin.index";
 
 export const Route = createFileRoute("/admin/menu")({ component: MenuAdmin });
+type Credentials = { userId: string; password: string };
 
 function MenuAdmin() {
-  const ov = useOverrides();
-  const [q, setQ] = useState("");
-  const [cat, setCat] = useState("all");
-  const rows = useMemo(() => {
-    let list = menuItems;
-    if (cat !== "all") list = list.filter((m) => m.category === cat);
-    if (q.trim()) list = list.filter((m) => m.name.toLowerCase().includes(q.trim().toLowerCase()));
-    return list;
-  }, [q, cat]);
-
-  const eightySixed = Object.entries(ov.map).filter(([, v]) => v.available === false).length;
-  const priceEdits = Object.entries(ov.map).filter(([, v]) => v.priceOverride != null).length;
-
-  return (
-    <div className="mx-auto max-w-6xl px-8 py-10">
-      <Header title="Menu Manager" sub={`${menuItems.length} dishes · ${eightySixed} unavailable · ${priceEdits} custom prices`} />
-
-      <div className="mt-6 flex flex-wrap gap-2">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search dishes…" className="rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-[var(--emerald)]" />
-        </div>
-        <select value={cat} onChange={(e) => setCat(e.target.value)} className="rounded-full border border-border bg-white px-4 py-2 text-sm">
-          <option value="all">All categories</option>
-          {categories.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
-        </select>
-        <button onClick={() => { ov.reset(); toast("Overrides cleared"); }} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-2 text-xs font-bold uppercase tracking-widest hover:bg-secondary">
-          <RotateCcw className="h-3 w-3" /> Reset overrides
-        </button>
-      </div>
-
-      <div className="mt-6 overflow-hidden rounded-sm border border-[var(--brass)]/25 bg-white">
-        <table className="w-full text-sm">
-          <thead className="bg-[var(--emerald-deep)] text-[var(--ivory)]">
-            <tr className="text-left text-[10px] uppercase tracking-widest">
-              <th className="px-4 py-3">Dish</th><th className="px-4 py-3">Category</th><th className="px-4 py-3">Base ₹</th><th className="px-4 py-3">Override ₹</th><th className="px-4 py-3 text-center">Available</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {rows.map((m) => {
-              const o = ov.map[m.id];
-              const available = o?.available !== false;
-              return (
-                <tr key={m.id} className={available ? "" : "bg-red-50/40"}>
-                  <td className="px-4 py-2">
-                    <div className="flex items-center gap-3">
-                      <img src={dishUrl(m.image)} alt={m.name} className="h-10 w-10 rounded-sm object-cover" loading="lazy" />
-                      <div>
-                        <p className="font-semibold">{m.name}</p>
-                        <p className="text-[11px] text-muted-foreground">{m.veg ? "Veg" : "Non-veg"}{m.chefPick ? " · Chef's pick" : ""}{m.popular ? " · Popular" : ""}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 text-muted-foreground">{categories.find((c) => c.id === m.category)?.title ?? m.category}</td>
-                  <td className="px-4 py-2">₹{m.price}</td>
-                  <td className="px-4 py-2">
-                    <input type="number" min={0} value={o?.priceOverride ?? ""} placeholder="—"
-                      onChange={(e) => {
-                        const v = e.target.value.trim();
-                        if (v === "") ov.set(m.id, { priceOverride: undefined });
-                        else ov.set(m.id, { priceOverride: Math.max(0, Number(v)) });
-                      }}
-                      className="w-24 rounded-sm border border-border bg-white px-2 py-1 text-sm" />
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    <button onClick={() => ov.set(m.id, { available: !available })}
-                      className={`relative h-6 w-11 rounded-full transition ${available ? "bg-[var(--emerald)]" : "bg-neutral-300"}`}>
-                      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition ${available ? "left-5" : "left-0.5"}`} />
-                    </button>
-                    <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{available ? "Live" : "86'd"}</p>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  const [q, setQ] = useState(""); const [cat, setCat] = useState("all");
+  const [draft, setDraft] = useState<any | null>(null); const [saving, setSaving] = useState(false);
+  const rows = useMemo(() => menuItems.filter(item => (cat === "all" || item.category === cat) && (!q.trim() || item.name.toLowerCase().includes(q.trim().toLowerCase()))), [q, cat]);
+  const submit = async () => {
+    const raw = sessionStorage.getItem("ratna_admin_credentials");
+    if (!raw) { toast.error("Please sign in again to submit this change"); return; }
+    const credentials = JSON.parse(raw) as Credentials;
+    setSaving(true);
+    try {
+      await ratnaSubmitMenuRequest({ data: { ...credentials, changeType: draft.type, targetName: draft.name, summary: draft.summary, payload: draft.payload } });
+      toast.success("Sent to Owner approvals"); setDraft(null);
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Could not submit menu request"); }
+    finally { setSaving(false); }
+  };
+  return <div className="mx-auto max-w-6xl px-5 py-8 md:px-8 md:py-10">
+    <Header title="Menu Manager" sub={`${menuItems.length} dishes · choose a section, then propose additions, price changes or removals for owner approval.`} />
+    <div className="mt-6 flex flex-wrap gap-2"><div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search dishes…" className="rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-[var(--emerald)]" /></div><select value={cat} onChange={e => setCat(e.target.value)} className="rounded-full border border-border bg-white px-4 py-2 text-sm"><option value="all">All sections</option>{categories.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}</select><button onClick={() => setDraft({ type: "dish", name: "", summary: "", payload: { category: cat === "all" ? categories[0]?.title : categories.find(c => c.id === cat)?.title, price: "", veg: true } })} className="inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-4 py-2 text-xs font-bold uppercase tracking-widest text-[var(--ivory)]"><Plus className="h-3.5 w-3.5" />Add dish</button></div>
+    <p className="mt-4 rounded-sm border border-[var(--brass)]/25 bg-[var(--brass)]/10 p-3 text-xs text-muted-foreground">Admin proposals never silently change the customer menu. The owner approves each addition, price revision, availability change or deletion in the Owner Console.</p>
+    <div className="mt-6 overflow-x-auto rounded-sm border border-[var(--brass)]/25 bg-white"><table className="w-full min-w-[760px] text-sm"><thead className="bg-[var(--emerald-deep)] text-[var(--ivory)]"><tr className="text-left text-[10px] uppercase tracking-widest"><th className="px-4 py-3">Dish</th><th className="px-4 py-3">Section</th><th className="px-4 py-3">Current price</th><th className="px-4 py-3 text-right">Actions</th></tr></thead><tbody className="divide-y divide-border">{rows.map(item => <tr key={item.id}><td className="px-4 py-3"><div className="flex items-center gap-3"><img src={dishUrl(item.image)} alt="" className="h-10 w-10 rounded-sm object-cover" /><div><p className="font-semibold">{item.name}</p><p className="text-[11px] text-muted-foreground">{item.veg ? "Vegetarian" : "Non-vegetarian"}</p></div></div></td><td className="px-4 py-3 text-muted-foreground">{categories.find(c => c.id === item.category)?.title ?? item.category}</td><td className="px-4 py-3">₹{item.price}</td><td className="px-4 py-3 text-right"><button onClick={() => setDraft({ type: "price", name: item.name, summary: `Propose a revised price for ${item.name}.`, payload: { old_price: item.price, offer_price: item.price, category: categories.find(c => c.id === item.category)?.title } })} className="mr-2 rounded-full border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">Edit price</button><button onClick={() => setDraft({ type: "availability", name: item.name, summary: `Remove ${item.name} from the live menu.`, payload: { action: "remove", category: categories.find(c => c.id === item.category)?.title } })} className="inline-flex items-center gap-1 rounded-full border border-red-200 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-red-700"><Trash2 className="h-3 w-3" />Remove</button></td></tr>)}</tbody></table></div>
+    {draft && <div className="fixed inset-0 z-[70] grid place-items-center bg-black/45 p-4"><div className="w-full max-w-lg rounded-sm bg-white p-6 shadow-2xl"><div className="flex items-start justify-between gap-4"><div><p className="eyebrow">Admin proposal</p><h2 className="mt-1 font-serif text-2xl italic text-[var(--emerald-deep)]">{draft.type === "dish" ? "Add a menu dish" : draft.type === "price" ? "Change dish price" : "Remove dish"}</h2></div><button onClick={() => setDraft(null)} className="text-sm">Close</button></div><div className="mt-5 space-y-3"><input placeholder="Dish name" disabled={draft.type !== "dish"} value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} className="w-full rounded-sm border border-border p-3 text-sm disabled:bg-secondary" />{draft.type !== "availability" && <><label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Menu section<select value={draft.payload.category ?? ""} onChange={e => setDraft({ ...draft, payload: { ...draft.payload, category: e.target.value } })} className="mt-1 w-full rounded-sm border border-border p-3 text-sm normal-case tracking-normal text-foreground">{categories.map(c => <option key={c.id}>{c.title}</option>)}</select></label><label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{draft.type === "price" ? "New price" : "Price"}<input type="number" min="0" value={draft.payload.offer_price ?? draft.payload.price ?? ""} onChange={e => setDraft({ ...draft, payload: { ...draft.payload, [draft.type === "price" ? "offer_price" : "price"]: Number(e.target.value) } })} className="mt-1 w-full rounded-sm border border-border p-3 text-sm" /></label></>}<textarea placeholder="Explain why this is needed for the menu" value={draft.summary} onChange={e => setDraft({ ...draft, summary: e.target.value })} className="min-h-24 w-full rounded-sm border border-border p-3 text-sm" /><button disabled={saving || !draft.name || draft.summary.length < 8} onClick={() => void submit()} className="rounded-full bg-[var(--emerald-deep)] px-5 py-3 text-xs font-bold uppercase tracking-widest text-[var(--ivory)] disabled:opacity-50">{saving ? "Submitting…" : "Send to owner approval"}</button></div></div></div>}
+  </div>;
 }

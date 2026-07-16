@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import {
   Download,
   FileText,
@@ -15,7 +15,7 @@ import JSZip from "jszip";
 import { useAutomations, useCustomerProfiles, useOrders, type Order } from "@/lib/admin-store";
 import { Header } from "./admin.index";
 
-export const Route = createFileRoute("/admin/owner")({ component: OwnerPage });
+export const Route = createFileRoute("/admin/owner")({ component: () => <Navigate to="/owner" /> });
 
 const rupees = (amount: number) =>
   `₹${amount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;

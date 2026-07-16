@@ -9,7 +9,6 @@ import {
   Settings as SettingsIcon,
   LogOut,
   Store,
-  Landmark,
   Menu,
   X,
 } from "lucide-react";
@@ -108,7 +107,6 @@ function Sidebar({
     { to: "/admin/orders", label: "Orders & Delivery", icon: Bike, badge: liveOrders },
     { to: "/admin/menu", label: "Menu Manager", icon: UtensilsCrossed, badge: 0 },
     { to: "/admin/enquiries", label: "Enquiries", icon: Inbox, badge: unreadEnq },
-    { to: "/admin/owner", label: "Owner & Finance", icon: Landmark, badge: 0 },
     { to: "/admin/settings", label: "Settings", icon: SettingsIcon, badge: 0 },
   ];
 

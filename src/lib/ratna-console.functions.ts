@@ -191,3 +191,42 @@ export const ratnaAddFestivalPlan = createServerFn({ method: "POST" })
     await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "custom_festival_added", metadata: { festival: data.festivalName, date: data.scheduledDate } });
     return { ok: true };
   });
+
+const menuRequestInput = credentials.extend({
+  changeType: z.enum(["dish", "price", "availability", "offer", "special", "custom_dish", "website"]),
+  targetName: z.string().trim().min(2).max(160),
+  summary: z.string().trim().min(8).max(600),
+  payload: z.record(z.string(), z.unknown()).default({}),
+});
+
+export const ratnaSubmitMenuRequest = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => menuRequestInput.parse(input))
+  .handler(async ({ data }) => {
+    const user = await authenticate(data, "admin");
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { error } = await db.from("ratna_menu_change_requests").insert({
+      requested_by: user.user_id, change_type: data.changeType, target_name: data.targetName,
+      summary: data.summary, payload: data.payload,
+    });
+    if (error) throw new Error(error.message);
+    await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: "menu_change_requested", metadata: { change_type: data.changeType, target: data.targetName } });
+    return { ok: true };
+  });
+
+export const ratnaReviewMenuRequest = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => credentials.extend({
+    id: z.string().uuid(), decision: z.enum(["approved", "rejected"]), comment: z.string().trim().max(500).optional(),
+  }).parse(input))
+  .handler(async ({ data }) => {
+    const user = await authenticate(data, "owner");
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { error } = await db.from("ratna_menu_change_requests").update({
+      status: data.decision, owner_comment: data.comment || null, reviewed_by: user.user_id,
+      reviewed_at: new Date().toISOString(),
+    }).eq("id", data.id).eq("status", "pending");
+    if (error) throw new Error(error.message);
+    await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: `menu_change_${data.decision}`, metadata: { request_id: data.id, comment: data.comment || null } });
+    return { ok: true };
+  });

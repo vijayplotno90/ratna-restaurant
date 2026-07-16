@@ -28,6 +28,7 @@ function AdminLogin() {
     setBusy(true);
     try {
       await ratnaAdminLogin({ data: { userId, password } });
+      sessionStorage.setItem("ratna_admin_credentials", JSON.stringify({ userId, password }));
       auth.unlockVerified();
       toast.success("Welcome back");
       window.location.assign("/admin/");

@@ -352,6 +352,12 @@ export const DEMO_AUTOMATIONS: Automation[] = [
   },
 ];
 
+export const DEMO_ENQUIRIES: Enquiry[] = [
+  { id: "enq-demo-1", createdAt: ago(0, 11), name: "Kavya Reddy", phone: "9876543230", message: "Need a family table for 12 on Saturday at 8 PM. Do you have a non-veg set menu?", status: "unread" },
+  { id: "enq-demo-2", createdAt: ago(1, 16), name: "Suresh Kumar", phone: "9876543231", message: "Please share the corporate lunch package for 35 people at our ECIL office.", status: "read" },
+  { id: "enq-demo-3", createdAt: ago(2, 18), name: "Farah Ali", phone: "9876543232", message: "Is the private dining area available for an anniversary dinner next Friday?", status: "replied" },
+];
+
 // ---------- generic helpers ----------
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -481,7 +487,7 @@ export function useAutomations() {
   };
 }
 export function useEnquiries() {
-  const [list, setList, hydrated] = useStored<Enquiry[]>(K.enquiries, []);
+  const [list, setList, hydrated] = useStored<Enquiry[]>(K.enquiries, DEMO_ENQUIRIES);
   return {
     list,
     hydrated,
