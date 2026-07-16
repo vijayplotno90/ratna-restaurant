@@ -510,6 +510,7 @@ export function useAdminAuth() {
       if (ok) setUnlocked(true);
       return ok;
     },
+    unlockVerified: () => setUnlocked(true),
     lock: () => setUnlocked(false),
   };
 }
