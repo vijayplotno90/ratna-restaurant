@@ -7,6 +7,7 @@ import {
   UtensilsCrossed,
   Inbox,
   Settings as SettingsIcon,
+  Sparkles,
   LogOut,
   Store,
   Crown,
@@ -116,6 +117,7 @@ function Sidebar({
     { to: "/admin/reservations", label: "Reservations", icon: CalendarCheck, badge: pendingRes },
     { to: "/admin/orders", label: "Orders & Delivery", icon: Bike, badge: liveOrders },
     { to: "/admin/menu", label: "Menu Manager", icon: UtensilsCrossed, badge: 0 },
+    { to: "/admin/specials", label: "Homepage Specials", icon: Sparkles, badge: 0 },
     { to: "/admin/enquiries", label: "Enquiries", icon: Inbox, badge: unreadEnq },
     { to: "/admin/settings", label: "Settings", icon: SettingsIcon, badge: 0 },
   ];

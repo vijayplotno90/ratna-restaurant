@@ -23,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as OrderIdRouteImport } from './routes/order.$id'
 import { Route as DishIdRouteImport } from './routes/dish.$id'
+import { Route as AdminSpecialsRouteImport } from './routes/admin.specials'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminReservationsRouteImport } from './routes/admin.reservations'
 import { Route as AdminOwnerRouteImport } from './routes/admin.owner'
@@ -101,6 +102,11 @@ const DishIdRoute = DishIdRouteImport.update({
   path: '/dish/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSpecialsRoute = AdminSpecialsRouteImport.update({
+  id: '/specials',
+  path: '/specials',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/admin/owner': typeof AdminOwnerRoute
   '/admin/reservations': typeof AdminReservationsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/specials': typeof AdminSpecialsRoute
   '/dish/$id': typeof DishIdRoute
   '/order/$id': typeof OrderIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/admin/owner': typeof AdminOwnerRoute
   '/admin/reservations': typeof AdminReservationsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/specials': typeof AdminSpecialsRoute
   '/dish/$id': typeof DishIdRoute
   '/order/$id': typeof OrderIdRoute
   '/admin': typeof AdminIndexRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/admin/owner': typeof AdminOwnerRoute
   '/admin/reservations': typeof AdminReservationsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/specials': typeof AdminSpecialsRoute
   '/dish/$id': typeof DishIdRoute
   '/order/$id': typeof OrderIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/owner'
     | '/admin/reservations'
     | '/admin/settings'
+    | '/admin/specials'
     | '/dish/$id'
     | '/order/$id'
     | '/admin/'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin/owner'
     | '/admin/reservations'
     | '/admin/settings'
+    | '/admin/specials'
     | '/dish/$id'
     | '/order/$id'
     | '/admin'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/admin/owner'
     | '/admin/reservations'
     | '/admin/settings'
+    | '/admin/specials'
     | '/dish/$id'
     | '/order/$id'
     | '/admin/'
@@ -393,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DishIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/specials': {
+      id: '/admin/specials'
+      path: '/specials'
+      fullPath: '/admin/specials'
+      preLoaderRoute: typeof AdminSpecialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -453,6 +472,7 @@ interface AdminRouteChildren {
   AdminOwnerRoute: typeof AdminOwnerRoute
   AdminReservationsRoute: typeof AdminReservationsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSpecialsRoute: typeof AdminSpecialsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -464,6 +484,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOwnerRoute: AdminOwnerRoute,
   AdminReservationsRoute: AdminReservationsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSpecialsRoute: AdminSpecialsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

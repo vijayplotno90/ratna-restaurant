@@ -85,6 +85,20 @@ export type Settings = {
   adminPass: string;
 };
 
+export type HomepageSpecial = {
+  id: string;
+  title: string;
+  eyebrow: string;
+  description: string;
+  image: string;
+  link: string;
+  kind: "signature" | "weekday" | "festival" | "occasion" | "offer";
+  enabled: boolean;
+  weekdays?: number[];
+  startDate?: string;
+  endDate?: string;
+};
+
 const K = {
   reservations: "ratna_admin_reservations_v1",
   orders: "ratna_admin_orders_v1",
@@ -93,6 +107,7 @@ const K = {
   settings: "ratna_admin_settings_v1",
   customerProfiles: "ratna_admin_customer_profiles_v1",
   automations: "ratna_admin_automations_v1",
+  specials: "ratna_admin_homepage_specials_v1",
   unlocked: "ratna_admin_unlocked_v1",
 };
 
@@ -353,6 +368,18 @@ export const DEMO_AUTOMATIONS: Automation[] = [
   },
 ];
 
+export const DEMO_HOMEPAGE_SPECIALS: HomepageSpecial[] = [
+  { id: "signature-biryani", title: "Ratna Signature Chicken Dum Biryani", eyebrow: "Signature since 2004", description: "Handi-sealed dum biryani, fragrant basmati and tender chicken — the plate Ratna is known for.", image: "chicken-dum-biryani", link: "/dish/chicken-biryani", kind: "signature", enabled: true },
+  { id: "monday-family", title: "Monday Family Table", eyebrow: "Monday special", description: "Start the week together: order two biryanis and add a Double Ka Meetha for the family table.", image: "double-ka-meetha", link: "/menu", kind: "weekday", weekdays: [1], enabled: true },
+  { id: "tuesday-tandoor", title: "Fresh From The Tandoor", eyebrow: "Tuesday special", description: "Chicken Tikka and live-charcoal tandoor favourites, served fresh from 6 PM.", image: "chicken-tikka", link: "/menu", kind: "weekday", weekdays: [2], enabled: true },
+  { id: "wednesday-veg", title: "Midweek Veg Feast", eyebrow: "Wednesday special", description: "Paneer Majestic, rich curries and fresh naan for a relaxed vegetarian dinner.", image: "paneer-majestic", link: "/menu", kind: "weekday", weekdays: [3], enabled: true },
+  { id: "thursday-kebabs", title: "Thursday Kebab Night", eyebrow: "Thursday special", description: "Gather over Chicken 65, seekh kebabs and tandoor-fired starters.", image: "chicken-65", link: "/menu", kind: "weekday", weekdays: [4], enabled: true },
+  { id: "friday-biryani", title: "Friday Biryani Night", eyebrow: "Friday special", description: "Make Friday delicious with our signature dum biryani and a complimentary raita upgrade.", image: "mutton-dum-biryani", link: "/menu", kind: "weekday", weekdays: [5], enabled: true },
+  { id: "sunday-family", title: "Sunday Family Biryani Feast", eyebrow: "Sunday special", description: "Slow down together over a generous family biryani meal at Ratna.", image: "chicken-fry-piece-biryani", link: "/menu", kind: "weekday", weekdays: [0], enabled: true },
+  { id: "birthday-treat", title: "A Sweet Birthday Treat From Ratna", eyebrow: "Birthday celebration", description: "Celebrate your birthday with us and ask our team about your complimentary sweet treat.", image: "gulab-jamun", link: "/reserve", kind: "occasion", enabled: true },
+  { id: "ugadi-2027", title: "Ugadi Wishes From Ratna", eyebrow: "Festival greeting · 7 Apr 2027", description: "Warm Ugadi wishes to you and your family. Celebrate the Telugu New Year with a Ratna family feast.", image: "kashmir-pulao", link: "/menu", kind: "festival", startDate: "2027-04-07", endDate: "2027-04-08", enabled: true },
+];
+
 export const DEMO_ENQUIRIES: Enquiry[] = [
   { id: "enq-demo-1", createdAt: minutesAgo(9), name: "Kavya Reddy", phone: "9876543230", message: "Need a family table for 12 on Saturday at 8 PM. Do you have a non-veg set menu?", status: "unread" },
   { id: "enq-demo-2", createdAt: minutesAgo(56), name: "Suresh Kumar", phone: "9876543231", message: "Please share the corporate lunch package for 35 people at our ECIL office.", status: "read" },
@@ -491,6 +518,15 @@ export function useAutomations() {
     hydrated,
     update: (id: string, patch: Partial<Automation>) =>
       setList((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item))),
+  };
+}
+export function useHomepageSpecials() {
+  const [list, setList, hydrated] = useStored<HomepageSpecial[]>(K.specials, DEMO_HOMEPAGE_SPECIALS);
+  return {
+    list, hydrated,
+    add: (item: Omit<HomepageSpecial, "id">) => setList((prev) => [{ ...item, id: uid() }, ...prev]),
+    update: (id: string, patch: Partial<HomepageSpecial>) => setList((prev) => prev.map((item) => item.id === id ? { ...item, ...patch } : item)),
+    remove: (id: string) => setList((prev) => prev.filter((item) => item.id !== id)),
   };
 }
 export function useEnquiries() {

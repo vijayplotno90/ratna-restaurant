@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Star, MapPin, Clock, Phone, Users, Utensils, Award, Flame, Sparkles, Quote, Snowflake, Check } from "lucide-react";
 import { SiteFooter, SiteNav } from "@/components/site-chrome";
 import { menuItems, RESTAURANT, dishUrl, categories, LOCATIONS } from "@/data/menu";
+import { HomepageSpecial, useHomepageSpecials } from "@/lib/admin-store";
 import heroInterior from "@/assets/hero-interior.jpg";
 import teamDinner from "@/assets/team-dinner.jpg";
 
@@ -61,6 +62,8 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      <HomepagePromotions />
 
       {/* CHEF'S PICKS — surfaced first so guests see the food immediately */}
       <section className="bg-white px-6 py-20 text-foreground md:px-10">
@@ -273,6 +276,65 @@ function HomePage() {
       <SiteFooter />
     </div>
   );
+}
+
+function HomepagePromotions() {
+  const { list, hydrated } = useHomepageSpecials();
+  const [active, setActive] = useState(0);
+  const today = new Date();
+  const todayKey = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
+  const weekday = today.getDay();
+  const live = list
+    .filter((item) => item.enabled)
+    .filter((item) => !item.startDate || (item.startDate <= todayKey && (item.endDate || item.startDate) >= todayKey))
+    .sort((a, b) => specialPriority(b, weekday) - specialPriority(a, weekday));
+  const shown = active % Math.max(live.length, 1);
+
+  useEffect(() => setActive(0), [todayKey, live.length]);
+  useEffect(() => {
+    if (live.length < 2) return;
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % live.length), 5500);
+    return () => window.clearInterval(timer);
+  }, [live.length]);
+
+  if (!hydrated || !live.length) return null;
+  return (
+    <section className="bg-[var(--ivory)] px-6 py-12 md:px-10 md:py-16">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="eyebrow text-[var(--emerald)]"><span className="ornament">Today at Ratna</span></p>
+            <h2 className="mt-2 font-serif text-3xl md:text-4xl">Something special is always on the table.</h2>
+          </div>
+          <Link to="/menu" className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-[var(--emerald)] underline decoration-[var(--brass)] decoration-2 underline-offset-4">See all dishes <ArrowRight className="h-4 w-4" /></Link>
+        </div>
+        <div className="relative min-h-[390px] overflow-hidden rounded-sm border border-[var(--brass)]/45 bg-[var(--emerald-deep)] shadow-lg md:min-h-[420px]">
+          {live.map((item, index) => (
+            <a key={item.id} href={item.link} aria-hidden={index !== shown} className={`absolute inset-0 transition-opacity duration-700 ${index === shown ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+              <img src={dishUrl(item.image)} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[var(--emerald-deep)] via-[var(--emerald-deep)]/80 to-[var(--emerald-deep)]/15" />
+              <div className="absolute inset-0 flex max-w-2xl flex-col justify-center p-7 text-[var(--ivory)] md:p-12">
+                <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[var(--brass)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--emerald-deep)]"><Sparkles className="h-3.5 w-3.5" /> {item.eyebrow}</span>
+                <h3 className="mt-5 font-serif text-4xl leading-tight md:text-6xl">{item.title}</h3>
+                <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--ivory)]/85 md:text-lg">{item.description}</p>
+                <span className="mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-[var(--brass)] px-6 py-3 text-xs font-bold uppercase tracking-widest text-[var(--emerald-deep)]">Explore now <ArrowRight className="h-4 w-4" /></span>
+              </div>
+            </a>
+          ))}
+          <div className="absolute bottom-5 right-6 z-10 flex gap-2">
+            {live.map((item, index) => <button key={item.id} onClick={() => setActive(index)} aria-label={`Show ${item.title}`} className={`h-2 rounded-full transition-all ${index === shown ? "w-8 bg-[var(--brass)]" : "w-2 bg-white/50"}`} />)}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function specialPriority(item: HomepageSpecial, weekday: number) {
+  if (item.startDate) return 30;
+  if (item.weekdays?.includes(weekday)) return 20;
+  if (item.kind === "signature") return 10;
+  return 5;
 }
 
 function Stat({ n, label }: { n: string; label: string }) {
