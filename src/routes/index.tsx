@@ -28,7 +28,7 @@ function HomePage() {
       {/* HERO */}
       <section className="relative isolate overflow-hidden bg-[var(--emerald)] text-[var(--ivory)] grain">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--emerald)] via-[var(--emerald)] to-[var(--emerald-deep)]" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-6 py-16 md:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+        <div className="relative mx-auto grid max-w-[1600px] items-center gap-10 px-6 py-16 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-20">
           <div className="text-center lg:text-left">
           <p className="eyebrow text-[var(--brass)]"><span className="ornament">Kushaiguda · Hyderabad</span></p>
           <h1 className="mt-6 font-serif text-6xl leading-[0.95] md:text-8xl lg:text-9xl">
@@ -284,20 +284,24 @@ function HeroPromotion() {
   const [active, setActive] = useState(0);
   const now = new Date();
   const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
-  const live = list.filter((item) => item.enabled)
-    .filter((item) => !item.startDate || (item.startDate <= today && (item.endDate || item.startDate) >= today))
-    .sort((a, b) => specialPriority(b, now.getDay()) - specialPriority(a, now.getDay()));
+  const enabled = list.filter((item) => item.enabled);
+  // One clear decision tree: a live festival replaces everything; otherwise
+  // show only today's weekday offer. A signature dish is a fallback only.
+  const festivals = enabled.filter((item) => item.startDate && item.startDate <= today && (item.endDate || item.startDate) >= today);
+  const weekdayOffers = enabled.filter((item) => !item.startDate && item.weekdays?.includes(now.getDay()));
+  const fallback = enabled.filter((item) => !item.startDate && !item.weekdays?.length && item.kind === "signature");
+  const live = festivals.length ? festivals : weekdayOffers.length ? weekdayOffers : fallback;
   const shown = active % Math.max(live.length, 1);
   useEffect(() => { if (live.length < 2) return; const timer = window.setInterval(() => setActive((value) => (value + 1) % live.length), 5500); return () => window.clearInterval(timer); }, [live.length]);
   if (!hydrated || !live.length) return null;
-  return <div className="relative min-h-[330px] overflow-hidden rounded-sm border border-[var(--brass)]/60 bg-[var(--emerald-deep)] shadow-2xl">
+  return <div className="relative min-h-[390px] w-full overflow-hidden rounded-sm border border-[var(--brass)]/60 bg-[var(--emerald-deep)] shadow-2xl md:min-h-[500px]">
     {live.map((item, index) => <a key={item.id} href={item.link} aria-hidden={index !== shown} className={`absolute inset-0 transition-opacity duration-700 ${index === shown ? "opacity-100" : "pointer-events-none opacity-0"}`}>
       <img src={dishUrl(item.image)} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--emerald-deep)] via-[var(--emerald-deep)]/55 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-6">
+      <div className="absolute inset-x-0 bottom-0 p-7 md:p-10">
         <span className="inline-flex items-center gap-1 rounded-full bg-[var(--brass)] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--emerald-deep)]"><Sparkles className="h-3 w-3" /> {item.eyebrow}</span>
-        <h2 className="mt-3 font-serif text-3xl leading-tight text-[var(--ivory)] md:text-4xl">{item.title}</h2>
-        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[var(--ivory)]/85">{item.description}</p>
+        <h2 className="mt-3 font-serif text-3xl leading-tight text-[var(--ivory)] md:text-5xl">{item.title}</h2>
+        <p className="mt-3 line-clamp-2 max-w-xl text-sm leading-relaxed text-[var(--ivory)]/85 md:text-base">{item.description}</p>
         <span className="mt-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--brass)]">Explore now <ArrowRight className="h-3.5 w-3.5" /></span>
       </div>
     </a>)}
