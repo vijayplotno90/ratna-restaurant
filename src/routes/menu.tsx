@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Leaf, Plus, X } from "lucide-react";
+import { Search, Leaf, Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { toast } from "sonner";
 import { SiteFooter, SiteNav } from "@/components/site-chrome";
 import {
@@ -186,6 +186,7 @@ function DishRow({
   onView: () => void;
 }) {
   const { add } = useCart();
+  const [qty, setQty] = useState(1);
   const price = priceAt(item.price, locId);
   return (
     <article className={`group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition lg:flex-row ${available ? "hover:shadow-md" : "opacity-60 grayscale"}`}>
@@ -226,21 +227,26 @@ function DishRow({
             </span>
           )}
         </p>
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <button disabled={!available}
             onClick={onView}
             className="text-[11px] font-semibold uppercase tracking-widest text-[var(--emerald-deep)] underline decoration-[var(--brass)] underline-offset-4"
           >
             Details
           </button>
-          <button
+          <div className="ml-auto inline-flex items-center overflow-hidden rounded-full border border-[var(--emerald)]/25 bg-white" aria-label={`Quantity for ${item.name}`}>
+            <button type="button" disabled={!available || qty <= 1} onClick={() => setQty((value) => Math.max(1, value - 1))} className="grid h-8 w-8 place-items-center text-[var(--emerald-deep)] disabled:opacity-35" aria-label="Decrease quantity"><Minus className="h-3.5 w-3.5" /></button>
+            <input type="number" min="1" max="99" value={qty} disabled={!available} onChange={(event) => setQty(Math.min(99, Math.max(1, Number(event.target.value) || 1)))} className="h-8 w-9 border-x border-[var(--emerald)]/15 bg-transparent text-center text-xs font-bold outline-none disabled:opacity-40" aria-label="Quantity" />
+            <button type="button" disabled={!available || qty >= 99} onClick={() => setQty((value) => Math.min(99, value + 1))} className="grid h-8 w-8 place-items-center text-[var(--emerald-deep)] disabled:opacity-35" aria-label="Increase quantity"><Plus className="h-3.5 w-3.5" /></button>
+          </div>
+          <button disabled={!available}
             onClick={() => {
-              add({ itemId: item.id, name: item.name, image: item.image, unitPrice: price });
-              toast.success(`${item.name} added`);
+              add({ itemId: item.id, name: item.name, image: item.image, unitPrice: price, qty });
+              toast.success(`${qty} × ${item.name} added`);
             }}
-            className="ml-auto inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[var(--ivory)] hover:bg-[var(--emerald)] disabled:bg-stone-400"
+            className="inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-[var(--ivory)] hover:bg-[var(--emerald)] disabled:bg-stone-400"
           >
-            <Plus className="h-3 w-3" /> {available ? "Add" : "Sold out"}
+            <ShoppingBag className="h-3.5 w-3.5" /> {available ? "Add" : "Sold out"}
           </button>
         </div>
       </div>

@@ -28,8 +28,9 @@ function HomePage() {
       {/* HERO */}
       <section className="relative isolate overflow-hidden bg-[var(--emerald)] text-[var(--ivory)] grain">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--emerald)] via-[var(--emerald)] to-[var(--emerald-deep)]" />
-        <div className="relative mx-auto grid max-w-[1600px] items-center gap-10 px-6 py-16 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-20">
-          <div className="text-center lg:text-left">
+        <div className="relative py-16 md:py-24">
+          <div className="mx-auto max-w-[1600px] px-6 md:px-10">
+          <div className="text-center lg:max-w-[640px] lg:text-left">
           <p className="eyebrow text-[var(--brass)]"><span className="ornament">Kushaiguda · Hyderabad</span></p>
           <h1 className="mt-6 font-serif text-6xl leading-[0.95] md:text-8xl lg:text-9xl">
             <span className="italic">Ratna</span> <span className="text-[var(--brass)]">&amp;</span> <span className="italic">Deluxe</span>
@@ -52,7 +53,9 @@ function HomePage() {
             <span className="inline-flex items-center gap-2"><Users className="h-3.5 w-3.5 text-[var(--brass)]" /> Seats {RESTAURANT.seats}+</span>
           </div>
           </div>
-          <HeroPromotion />
+          <div className="mt-10 lg:hidden"><HeroPromotion /></div>
+          </div>
+          <div className="hidden lg:absolute lg:inset-y-0 lg:left-1/2 lg:right-0 lg:block"><HeroPromotion /></div>
         </div>
 
         <div className="relative border-t border-[var(--brass)]/30 bg-[var(--emerald-deep)]/40 py-3 text-[10px] font-semibold uppercase tracking-[0.35em] text-[var(--ivory)]/75">
@@ -294,7 +297,7 @@ function HeroPromotion() {
   const shown = active % Math.max(live.length, 1);
   useEffect(() => { if (live.length < 2) return; const timer = window.setInterval(() => setActive((value) => (value + 1) % live.length), 5500); return () => window.clearInterval(timer); }, [live.length]);
   if (!hydrated || !live.length) return null;
-  return <div className="relative min-h-[390px] w-full overflow-hidden rounded-sm border border-[var(--brass)]/60 bg-[var(--emerald-deep)] shadow-2xl md:min-h-[500px]">
+  return <div className="relative min-h-[390px] w-full overflow-hidden rounded-sm border border-[var(--brass)]/60 bg-[var(--emerald-deep)] shadow-2xl md:min-h-[500px] lg:h-full lg:min-h-0 lg:rounded-none lg:border-y-0 lg:border-r-0">
     {live.map((item, index) => <a key={item.id} href={item.link} aria-hidden={index !== shown} className={`absolute inset-0 transition-opacity duration-700 ${index === shown ? "opacity-100" : "pointer-events-none opacity-0"}`}>
       <img src={dishUrl(item.image)} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--emerald-deep)] via-[var(--emerald-deep)]/55 to-transparent" />
