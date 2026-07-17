@@ -230,3 +230,74 @@ export const ratnaReviewMenuRequest = createServerFn({ method: "POST" })
     await db.from("ratna_console_audit").insert({ actor_user_id: user.user_id, action: `menu_change_${data.decision}`, metadata: { request_id: data.id, comment: data.comment || null } });
     return { ok: true };
   });
+
+const customerPhone = z.string().trim().regex(/^\d{10}$/, "Enter a valid 10-digit mobile number");
+const customerProfile = z.object({
+  fullName: z.string().trim().min(2).max(100), phone: customerPhone,
+  email: z.string().trim().email(), birthday: z.string().date(),
+  gender: z.string().trim().min(1).max(40), relationshipStatus: z.string().trim().min(1).max(40),
+  importantPeople: z.array(z.object({ name: z.string(), relation: z.string(), date: z.string() })).default([]),
+  importantDates: z.array(z.object({ label: z.string(), date: z.string() })).default([]),
+  referralCode: z.string().trim().max(60).optional(), defaultAddress: z.string().trim().min(8).max(300),
+  marketingConsent: z.boolean().default(false),
+});
+
+/** The seeded Ram account can use a private demo code. All real customers require an SMS provider. */
+export const ratnaRequestCustomerOtp = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => z.object({ phone: customerPhone, purpose: z.enum(["sign_in", "create_account"]) }).parse(input))
+  .handler(async ({ data }) => {
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { data: profile, error } = await db.from("ratna_customer_profiles").select("phone").eq("phone", data.phone).maybeSingle();
+    if (error) throw new Error(error.message);
+    if (data.purpose === "sign_in" && !profile) throw new Error("No Ratna account found for this mobile number. Please create one.");
+    if (data.purpose === "create_account" && profile) throw new Error("This mobile number already has a Ratna account. Please sign in.");
+    await db.from("ratna_customer_otps").delete().eq("phone", data.phone).is("used_at", null);
+    const code = data.phone === "9999999999" ? process.env.RATNA_RAM_DEMO_OTP : undefined;
+    if (!code) throw new Error("SMS OTP delivery is not configured yet. The Ratna team can still test Ram's demo account after setting RATNA_RAM_DEMO_OTP in Vercel.");
+    const { error: insertError } = await db.from("ratna_customer_otps").insert({ phone: data.phone, code, purpose: data.purpose, expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString() });
+    if (insertError) throw new Error(insertError.message);
+    return { demo: data.phone === "9999999999" };
+  });
+
+export const ratnaCreateCustomerAccount = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => customerProfile.parse(input))
+  .handler(async ({ data }) => {
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { error } = await db.from("ratna_customer_profiles").insert({
+      phone: data.phone, full_name: data.fullName, email: data.email, birthday: data.birthday,
+      gender: data.gender, relationship_status: data.relationshipStatus, important_people: data.importantPeople,
+      important_dates: data.importantDates, default_address: data.defaultAddress, marketing_consent: data.marketingConsent,
+      notes: data.referralCode ? `Referral code: ${data.referralCode}` : null,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const ratnaVerifyCustomerOtp = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => z.object({ phone: customerPhone, code: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code") }).parse(input))
+  .handler(async ({ data }) => {
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { data: otp, error } = await db.from("ratna_customer_otps").select("id").eq("phone", data.phone).eq("code", data.code).is("used_at", null).gt("expires_at", new Date().toISOString()).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!otp) throw new Error("That code is invalid or has expired. Please request a new one.");
+    await db.from("ratna_customer_otps").update({ used_at: new Date().toISOString() }).eq("id", otp.id);
+    const { data: profile, error: profileError } = await db.from("ratna_customer_profiles").select("phone, full_name").eq("phone", data.phone).maybeSingle();
+    if (profileError || !profile) throw new Error(profileError?.message ?? "Account profile not found");
+    return { customer: { phone: profile.phone, name: profile.full_name || "Ratna customer" } };
+  });
+
+export const ratnaCustomerOrders = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => z.object({ phone: customerPhone }).parse(input))
+  .handler(async ({ data }) => {
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { data: orders, error } = await db.from("ratna_orders").select("id, order_number, customer_name, customer_phone, fulfilment, status, subtotal, delivery_fee, gst_amount, total, created_at").eq("customer_phone", data.phone).order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const ids = (orders ?? []).map((order) => order.id);
+    const { data: items, error: itemsError } = ids.length ? await db.from("ratna_order_items").select("order_id, item_name, quantity, unit_price").in("order_id", ids) : { data: [], error: null };
+    if (itemsError) throw new Error(itemsError.message);
+    return { orders: orders ?? [], items: items ?? [] };
+  });

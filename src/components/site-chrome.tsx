@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingBag, MapPin, Phone, Clock, Instagram, Facebook, Menu, X, MessageCircle, UserRound } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logo from "@/assets/ratna-logo.png";
 import { useCart } from "@/lib/cart";
 import { RESTAURANT } from "@/data/menu";
@@ -8,6 +8,13 @@ import { RESTAURANT } from "@/data/menu";
 export function SiteNav() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
+  const [customerSignedIn, setCustomerSignedIn] = useState(false);
+  useEffect(() => {
+    const syncCustomer = () => setCustomerSignedIn(Boolean(sessionStorage.getItem("ratna_customer_session_v2")));
+    syncCustomer();
+    window.addEventListener("storage", syncCustomer);
+    return () => window.removeEventListener("storage", syncCustomer);
+  }, []);
   return (
     <>
       <div className="bg-[var(--emerald)] text-[var(--ivory)]/90 text-[11px] tracking-[0.2em] uppercase">
@@ -35,7 +42,7 @@ export function SiteNav() {
             <NavLink to="/reserve">Reserve</NavLink>
             <NavLink to="/corporate">Corporate</NavLink>
             <NavLink to="/visit">Visit</NavLink>
-            <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />Sign in</Link>
+            <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />{customerSignedIn ? "My Ratna" : "Sign in"}</Link>
           </div>
 
           <div className="flex items-center gap-2">
@@ -59,7 +66,7 @@ export function SiteNav() {
               <MobileLink to="/reserve" onClick={() => setOpen(false)}>Reserve a Table</MobileLink>
               <MobileLink to="/corporate" onClick={() => setOpen(false)}>Corporate & Team Lunches</MobileLink>
               <MobileLink to="/visit" onClick={() => setOpen(false)}>Visit Us</MobileLink>
-              <MobileLink to="/account" onClick={() => setOpen(false)}>Sign in</MobileLink>
+              <MobileLink to="/account" onClick={() => setOpen(false)}>{customerSignedIn ? "My Ratna" : "Sign in"}</MobileLink>
             </div>
           </div>
         )}
