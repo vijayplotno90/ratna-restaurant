@@ -255,8 +255,11 @@ export const ratnaRequestCustomerOtp = createServerFn({ method: "POST" })
     if (data.purpose === "sign_in" && !profile) throw new Error("No Ratna account found for this mobile number. Please create one.");
     if (data.purpose === "create_account" && profile) throw new Error("This mobile number already has a Ratna account. Please sign in.");
     await db.from("ratna_customer_otps").delete().eq("phone", data.phone).is("used_at", null);
-    const code = data.phone === "9999999999" ? process.env.RATNA_RAM_DEMO_OTP : undefined;
-    if (!code) throw new Error("SMS OTP delivery is not configured yet. The Ratna team can still test Ram's demo account after setting RATNA_RAM_DEMO_OTP in Vercel.");
+    // Ram is an intentionally public demo account for client walkthroughs. It does
+    // not send an SMS: the fixed code is shown on the sign-in screen. Real-phone
+    // OTP delivery will be added only when an SMS provider is connected.
+    const code = data.phone === "9999999999" ? (process.env.RATNA_RAM_DEMO_OTP || "000000") : undefined;
+    if (!code) throw new Error("SMS OTP delivery is not configured yet. Please create an account for the demo walkthrough, or ask Ratna to enable SMS OTP delivery.");
     const { error: insertError } = await db.from("ratna_customer_otps").insert({ phone: data.phone, code, purpose: data.purpose, expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString() });
     if (insertError) throw new Error(insertError.message);
     return { demo: data.phone === "9999999999" };

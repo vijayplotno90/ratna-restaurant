@@ -30,7 +30,7 @@ function AccountPage() {
     if (tab === "create_account" && (!form.fullName || !form.email || !form.birthday || !form.gender || !form.relationshipStatus || !form.defaultAddress)) return toast.error("Please complete the required account details.");
     setBusy(true); try {
       const result = await ratnaRequestCustomerOtp({ data: { phone: validPhone, purpose: tab } });
-      setPhone(validPhone); setStep("otp"); toast.success(result.demo ? "Ram demo OTP requested. Use the private demo code configured by Ratna." : "OTP requested.");
+      setPhone(validPhone); setStep("otp"); toast.success(result.demo ? "Ram demo account ready. Use OTP 000000." : "OTP requested.");
     } catch (error: any) { toast.error(error.message); } finally { setBusy(false); }
   };
   const verify = async (event: React.FormEvent) => {
@@ -48,7 +48,7 @@ function AccountPage() {
       {step === "details" ? <form onSubmit={request} className="mt-7 space-y-5">{tab === "create_account" && <ProfileFields form={form} setForm={setForm} people={people} setPeople={setPeople} dates={dates} setDates={setDates} />}
         <label className="block text-sm font-semibold">Mobile number <div className="mt-2 flex rounded-xl border border-border bg-white px-4"><span className="py-3.5 text-muted-foreground">+91</span><input required inputMode="numeric" value={phone} onChange={(event) => setPhone(cleanPhone(event.target.value))} placeholder="9866..." className="min-w-0 flex-1 bg-transparent px-3 outline-none" /></div></label>
         <button disabled={busy} className="w-full rounded-full bg-[var(--emerald)] py-4 text-sm font-bold uppercase tracking-widest text-white disabled:opacity-60">{busy ? "Please wait…" : tab === "sign_in" ? "Send OTP" : "Verify mobile & create account"}</button>
-        {tab === "sign_in" && <p className="text-center text-sm text-muted-foreground">Returning customer? Mobile + OTP is all you need.<br /><span className="text-xs">Demo Ram account: <b>9999999999</b></span></p>}
+        {tab === "sign_in" && <p className="text-center text-sm text-muted-foreground">Returning customer? Mobile + OTP is all you need.<br /><span className="text-xs">Demo Ram account: <b>9999999999</b> · OTP: <b>000000</b></span></p>}
       </form> : <form onSubmit={verify} className="mt-8 max-w-lg space-y-4"><p className="rounded-xl bg-[var(--ivory)] p-4 text-sm">Enter the 6-digit code sent to <b>+91 {phone}</b>.</p><label className="block text-sm font-semibold">6-digit OTP<input autoFocus required inputMode="numeric" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))} className="mt-2 w-full rounded-xl border px-4 py-3.5 text-lg tracking-[0.4em] outline-none" /></label><button disabled={busy} className="w-full rounded-full bg-[var(--emerald)] py-4 text-sm font-bold uppercase tracking-widest text-white">{busy ? "Verifying…" : tab === "create_account" ? "Create account" : "Sign in"}</button><button type="button" onClick={() => setStep("details")} className="w-full text-sm font-semibold text-[var(--emerald)]">Change mobile number</button></form>}
     </section> : <Orders customer={customer} orders={orders} items={items} openOrder={openOrder} setOpenOrder={setOpenOrder} onSignOut={() => { sessionStorage.removeItem(SESSION_KEY); setCustomer(null); }} printBill={printBill} />}
   </main><SiteFooter /></div>;

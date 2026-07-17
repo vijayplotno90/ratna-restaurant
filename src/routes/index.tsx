@@ -28,16 +28,17 @@ function HomePage() {
       {/* HERO */}
       <section className="relative isolate overflow-hidden bg-[var(--emerald)] text-[var(--ivory)] grain">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--emerald)] via-[var(--emerald)] to-[var(--emerald-deep)]" />
-        <div className="relative mx-auto max-w-6xl px-6 py-24 text-center md:py-36">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-6 py-16 md:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+          <div className="text-center lg:text-left">
           <p className="eyebrow text-[var(--brass)]"><span className="ornament">Kushaiguda · Hyderabad</span></p>
           <h1 className="mt-6 font-serif text-6xl leading-[0.95] md:text-8xl lg:text-9xl">
             <span className="italic">Ratna</span> <span className="text-[var(--brass)]">&amp;</span> <span className="italic">Deluxe</span>
           </h1>
-          <div className="mx-auto mt-6 h-px w-24 bg-[var(--brass)]" />
-          <p className="mx-auto mt-6 max-w-xl font-serif text-xl italic text-[var(--ivory)]/85 md:text-2xl">
+          <div className="mx-auto mt-6 h-px w-24 bg-[var(--brass)] lg:mx-0" />
+          <p className="mx-auto mt-6 max-w-xl font-serif text-xl italic text-[var(--ivory)]/85 md:text-2xl lg:mx-0">
             Twenty years of Hyderabadi hospitality — two dining rooms, one legendary kitchen. Biryani from the copper handi, kebabs from live charcoal, sweets from the old city.
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
             <Link to="/reserve" className="inline-flex items-center gap-2 rounded-full bg-[var(--brass)] px-8 py-4 text-sm font-bold uppercase tracking-widest text-[var(--emerald-deep)] shadow-lg transition hover:brightness-95">
               Reserve a Table <ArrowRight className="h-4 w-4" />
             </Link>
@@ -45,11 +46,13 @@ function HomePage() {
               Explore the Menu
             </Link>
           </div>
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-xs uppercase tracking-[0.25em] text-[var(--ivory)]/70">
+          <div className="mt-14 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-xs uppercase tracking-[0.25em] text-[var(--ivory)]/70 lg:justify-start">
             <span className="inline-flex items-center gap-2"><Star className="h-3.5 w-3.5 fill-[var(--brass)] text-[var(--brass)]" /> {RESTAURANT.rating} · {RESTAURANT.reviews.toLocaleString()} ratings</span>
             <span className="inline-flex items-center gap-2"><Award className="h-3.5 w-3.5 text-[var(--brass)]" /> {new Date().getFullYear() - RESTAURANT.established} years in business</span>
             <span className="inline-flex items-center gap-2"><Users className="h-3.5 w-3.5 text-[var(--brass)]" /> Seats {RESTAURANT.seats}+</span>
           </div>
+          </div>
+          <HeroPromotion />
         </div>
 
         <div className="relative border-t border-[var(--brass)]/30 bg-[var(--emerald-deep)]/40 py-3 text-[10px] font-semibold uppercase tracking-[0.35em] text-[var(--ivory)]/75">
@@ -62,8 +65,6 @@ function HomePage() {
           </div>
         </div>
       </section>
-
-      <HomepagePromotions />
 
       {/* CHEF'S PICKS — surfaced first so guests see the food immediately */}
       <section className="bg-white px-6 py-20 text-foreground md:px-10">
@@ -276,6 +277,32 @@ function HomePage() {
       <SiteFooter />
     </div>
   );
+}
+
+function HeroPromotion() {
+  const { list, hydrated } = useHomepageSpecials();
+  const [active, setActive] = useState(0);
+  const now = new Date();
+  const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
+  const live = list.filter((item) => item.enabled)
+    .filter((item) => !item.startDate || (item.startDate <= today && (item.endDate || item.startDate) >= today))
+    .sort((a, b) => specialPriority(b, now.getDay()) - specialPriority(a, now.getDay()));
+  const shown = active % Math.max(live.length, 1);
+  useEffect(() => { if (live.length < 2) return; const timer = window.setInterval(() => setActive((value) => (value + 1) % live.length), 5500); return () => window.clearInterval(timer); }, [live.length]);
+  if (!hydrated || !live.length) return null;
+  return <div className="relative min-h-[330px] overflow-hidden rounded-sm border border-[var(--brass)]/60 bg-[var(--emerald-deep)] shadow-2xl">
+    {live.map((item, index) => <a key={item.id} href={item.link} aria-hidden={index !== shown} className={`absolute inset-0 transition-opacity duration-700 ${index === shown ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+      <img src={dishUrl(item.image)} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[var(--emerald-deep)] via-[var(--emerald-deep)]/55 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-6">
+        <span className="inline-flex items-center gap-1 rounded-full bg-[var(--brass)] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--emerald-deep)]"><Sparkles className="h-3 w-3" /> {item.eyebrow}</span>
+        <h2 className="mt-3 font-serif text-3xl leading-tight text-[var(--ivory)] md:text-4xl">{item.title}</h2>
+        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[var(--ivory)]/85">{item.description}</p>
+        <span className="mt-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--brass)]">Explore now <ArrowRight className="h-3.5 w-3.5" /></span>
+      </div>
+    </a>)}
+    <div className="absolute right-4 top-4 z-10 flex gap-1.5">{live.map((item, index) => <button key={item.id} onClick={() => setActive(index)} aria-label={`Show ${item.title}`} className={`h-1.5 rounded-full transition-all ${index === shown ? "w-6 bg-[var(--brass)]" : "w-1.5 bg-white/55"}`} />)}</div>
+  </div>;
 }
 
 function HomepagePromotions() {
