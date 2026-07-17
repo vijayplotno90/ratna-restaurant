@@ -156,7 +156,7 @@ export const RESTAURANT = {
   established: 2004,
   rating: 4.0,
   reviews: 8616,
-  seats: 120,
+  seats: 60,
   ac: true,
   map: "https://maps.google.com/?q=Ratna+Restaurant+Chakripuram+Kushaiguda+Hyderabad",
   // Approximate coordinates of the storefront — used for delivery-radius checks.
@@ -190,7 +190,7 @@ export const LOCATIONS: Location[] = [
     description:
       "Our classic multi-cuisine hall — buzzy, family-friendly, quick service. Standard menu pricing, no service charge. Perfect for weekday meals and takeaway.",
     ac: false,
-    seats: 60,
+    seats: 30,
     priceMultiplier: 1,
     minGuests: 1,
     reserveNote: "Walk-ins welcome. Reservations recommended for groups of 6+.",
@@ -204,7 +204,7 @@ export const LOCATIONS: Location[] = [
     description:
       "Our premium fully air-conditioned dining hall — soft lighting, roomier tables, quieter setting. Deluxe pricing includes A/C service. Ideal for date nights, celebrations and corporate lunches.",
     ac: true,
-    seats: 120,
+    seats: 30,
     priceMultiplier: 1.15,
     minGuests: 2,
     reserveNote: "Reservations recommended after 7 PM and on weekends.",

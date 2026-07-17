@@ -13,6 +13,7 @@ import {
   type MenuItem,
 } from "@/data/menu";
 import { useCart } from "@/lib/cart";
+import { useOverrides } from "@/lib/admin-store";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
@@ -35,6 +36,7 @@ function MenuPage() {
   const [detail, setDetail] = useState<MenuItem | null>(null);
   const [locId, setLocId] = useState<"ratna" | "deluxe">("ratna");
   const location = getLocation(locId);
+  const availability = useOverrides();
 
   const filtered = useMemo(() => {
     let list = search.trim()
@@ -159,7 +161,7 @@ function MenuPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               {filtered.map((m) => (
-                <DishRow key={m.id} item={m} locId={locId} onView={() => setDetail(m)} />
+                <DishRow key={m.id} item={m} locId={locId} available={availability.map[m.id]?.available !== false} onView={() => setDetail(m)} />
               ))}
             </div>
           )}
@@ -175,16 +177,18 @@ function MenuPage() {
 function DishRow({
   item,
   locId,
+  available,
   onView,
 }: {
   item: MenuItem;
   locId: "ratna" | "deluxe";
+  available: boolean;
   onView: () => void;
 }) {
   const { add } = useCart();
   const price = priceAt(item.price, locId);
   return (
-    <article className="group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition hover:shadow-md lg:flex-row">
+    <article className={`group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition lg:flex-row ${available ? "hover:shadow-md" : "opacity-60 grayscale"}`}>
       <div className="flex-1 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <span
@@ -223,7 +227,7 @@ function DishRow({
           )}
         </p>
         <div className="mt-3 flex gap-2">
-          <button
+          <button disabled={!available}
             onClick={onView}
             className="text-[11px] font-semibold uppercase tracking-widest text-[var(--emerald-deep)] underline decoration-[var(--brass)] underline-offset-4"
           >
@@ -234,9 +238,9 @@ function DishRow({
               add({ itemId: item.id, name: item.name, image: item.image, unitPrice: price });
               toast.success(`${item.name} added`);
             }}
-            className="ml-auto inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[var(--ivory)] hover:bg-[var(--emerald)]"
+            className="ml-auto inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[var(--ivory)] hover:bg-[var(--emerald)] disabled:bg-stone-400"
           >
-            <Plus className="h-3 w-3" /> Add
+            <Plus className="h-3 w-3" /> {available ? "Add" : "Sold out"}
           </button>
         </div>
       </div>

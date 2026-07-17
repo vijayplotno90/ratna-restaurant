@@ -70,11 +70,12 @@ function HomePage() {
             <h2 className="mt-3 font-serif text-4xl md:text-5xl">Chef's Selection</h2>
             <p className="mx-auto mt-3 max-w-xl text-muted-foreground">The plates our regulars come back for, and the ones our chef would order himself.</p>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory">
             {chefPicks.map((d) => (
-              <Link key={d.id} to="/dish/$id" params={{ id: d.id }} className="group relative block overflow-hidden rounded-sm border border-[var(--brass)]/40 bg-white shadow-sm transition hover:border-[var(--emerald)] hover:shadow-lg">
+              <Link key={d.id} to="/dish/$id" params={{ id: d.id }} className="group relative block w-[280px] shrink-0 snap-start overflow-hidden rounded-sm border border-[var(--brass)]/40 bg-white shadow-sm transition hover:border-[var(--emerald)] hover:shadow-lg">
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <img src={dishUrl(d.image)} alt={d.name} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                  <span className="pointer-events-none absolute left-1/2 top-1/2 h-20 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/15 blur-2xl animate-pulse" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-6">
                     <VegDot veg={d.veg} />
