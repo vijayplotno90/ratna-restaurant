@@ -239,6 +239,8 @@ const customerProfile = z.object({
   importantPeople: z.array(z.object({ name: z.string(), relation: z.string(), date: z.string() })).default([]),
   importantDates: z.array(z.object({ label: z.string(), date: z.string() })).default([]),
   referralCode: z.string().trim().max(60).optional(), defaultAddress: z.string().trim().min(8).max(300),
+  deliveryLatitude: z.number().min(-90).max(90).nullable().optional(),
+  deliveryLongitude: z.number().min(-180).max(180).nullable().optional(),
   marketingConsent: z.boolean().default(false),
 });
 
@@ -269,6 +271,7 @@ export const ratnaCreateCustomerAccount = createServerFn({ method: "POST" })
       phone: data.phone, full_name: data.fullName, email: data.email, birthday: data.birthday,
       gender: data.gender, relationship_status: data.relationshipStatus, important_people: data.importantPeople,
       important_dates: data.importantDates, default_address: data.defaultAddress, marketing_consent: data.marketingConsent,
+      delivery_latitude: data.deliveryLatitude ?? null, delivery_longitude: data.deliveryLongitude ?? null,
       notes: data.referralCode ? `Referral code: ${data.referralCode}` : null,
     });
     if (error) throw new Error(error.message);
