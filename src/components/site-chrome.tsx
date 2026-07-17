@@ -8,6 +8,7 @@ import { RESTAURANT } from "@/data/menu";
 export function SiteNav() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
+  const signedIn = typeof window !== "undefined" && Boolean(sessionStorage.getItem("ratna_customer"));
   return (
     <>
       <div className="bg-[var(--emerald)] text-[var(--ivory)]/90 text-[11px] tracking-[0.2em] uppercase">
@@ -35,7 +36,7 @@ export function SiteNav() {
             <NavLink to="/reserve">Reserve</NavLink>
             <NavLink to="/corporate">Corporate</NavLink>
             <NavLink to="/visit">Visit</NavLink>
-            <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />Sign in / My Ratna</Link>
+            <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />{signedIn ? "My Ratna" : "Sign in"}</Link>
           </div>
 
           <div className="flex items-center gap-2">
@@ -59,7 +60,7 @@ export function SiteNav() {
               <MobileLink to="/reserve" onClick={() => setOpen(false)}>Reserve a Table</MobileLink>
               <MobileLink to="/corporate" onClick={() => setOpen(false)}>Corporate & Team Lunches</MobileLink>
               <MobileLink to="/visit" onClick={() => setOpen(false)}>Visit Us</MobileLink>
-              <MobileLink to="/account" onClick={() => setOpen(false)}>Sign in / My Ratna</MobileLink>
+              <MobileLink to="/account" onClick={() => setOpen(false)}>{signedIn ? "My Ratna" : "Sign in"}</MobileLink>
             </div>
           </div>
         )}
