@@ -35,7 +35,10 @@ function AdminLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [ownerSession, setOwnerSession] = useState(false);
 
-  useEffect(() => { setOwnerSession(document.cookie.split(";").some(item => item.trim() === "ratna_owner_session_v1=1")); }, []);
+  useEffect(() => {
+    const hasOwnerCookie = document.cookie.split(";").some(item => item.trim() === "ratna_owner_session_v1=1");
+    setOwnerSession(hasOwnerCookie || Boolean(sessionStorage.getItem("ratna_owner_credentials")));
+  }, []);
 
   useEffect(() => {
     if (auth.hydrated && !auth.unlocked && pathname !== "/admin/login") {
