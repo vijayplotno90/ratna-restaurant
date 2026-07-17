@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag, MapPin, Phone, Clock, Instagram, Facebook, Menu, X, MessageCircle, Crown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ShoppingBag, MapPin, Phone, Clock, Instagram, Facebook, Menu, X, MessageCircle, UserRound } from "lucide-react";
+import { useState } from "react";
 import logo from "@/assets/ratna-logo.png";
 import { useCart } from "@/lib/cart";
 import { RESTAURANT } from "@/data/menu";
@@ -8,10 +8,6 @@ import { RESTAURANT } from "@/data/menu";
 export function SiteNav() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
-  const [ownerSession, setOwnerSession] = useState(false);
-  useEffect(() => {
-    setOwnerSession(document.cookie.split(";").some((item) => item.trim() === "ratna_owner_session_v1=1"));
-  }, []);
   return (
     <>
       <div className="bg-[var(--emerald)] text-[var(--ivory)]/90 text-[11px] tracking-[0.2em] uppercase">
@@ -39,11 +35,10 @@ export function SiteNav() {
             <NavLink to="/reserve">Reserve</NavLink>
             <NavLink to="/corporate">Corporate</NavLink>
             <NavLink to="/visit">Visit</NavLink>
-            <NavLink to="/account">My Ratna</NavLink>
+            <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />Sign in / My Ratna</Link>
           </div>
 
           <div className="flex items-center gap-2">
-            {ownerSession && <a href="/owner" className="hidden items-center gap-1.5 rounded-full border border-[var(--brass)]/55 bg-[var(--brass)]/10 px-3 py-2 text-xs font-bold text-[var(--emerald-deep)] md:inline-flex"><Crown className="h-3.5 w-3.5" />Owner Console</a>}
             <Link to="/cart" className="relative inline-flex items-center gap-2 rounded-full bg-[var(--emerald)] px-4 py-2.5 text-sm font-semibold text-[var(--ivory)] shadow-sm transition hover:bg-[var(--emerald-deep)]">
               <ShoppingBag className="h-4 w-4" />
               <span className="hidden sm:inline">Order</span>
@@ -64,8 +59,7 @@ export function SiteNav() {
               <MobileLink to="/reserve" onClick={() => setOpen(false)}>Reserve a Table</MobileLink>
               <MobileLink to="/corporate" onClick={() => setOpen(false)}>Corporate & Team Lunches</MobileLink>
               <MobileLink to="/visit" onClick={() => setOpen(false)}>Visit Us</MobileLink>
-              <MobileLink to="/account" onClick={() => setOpen(false)}>My Ratna</MobileLink>
-              {ownerSession && <a href="/owner" className="rounded-lg px-3 py-2 text-base font-medium text-[var(--emerald-deep)] hover:bg-secondary">Owner Console</a>}
+              <MobileLink to="/account" onClick={() => setOpen(false)}>Sign in / My Ratna</MobileLink>
             </div>
           </div>
         )}
