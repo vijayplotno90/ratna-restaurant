@@ -288,12 +288,12 @@ function HeroPromotion() {
   const now = new Date();
   const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
   const enabled = list.filter((item) => item.enabled);
-  // One clear decision tree: a live festival replaces everything; otherwise
-  // show only today's weekday offer. A signature dish is a fallback only.
+  // A live festival replaces everything. Otherwise, today's weekday offer is
+  // shown first and then the evergreen Ratna signature dishes rotate after it.
   const festivals = enabled.filter((item) => item.startDate && item.startDate <= today && (item.endDate || item.startDate) >= today);
   const weekdayOffers = enabled.filter((item) => !item.startDate && item.weekdays?.includes(now.getDay()));
-  const fallback = enabled.filter((item) => !item.startDate && !item.weekdays?.length && item.kind === "signature");
-  const live = festivals.length ? festivals : weekdayOffers.length ? weekdayOffers : fallback;
+  const everydayPromotions = enabled.filter((item) => !item.startDate && !item.weekdays?.length && item.kind === "signature");
+  const live = festivals.length ? festivals : [...weekdayOffers, ...everydayPromotions];
   const shown = active % Math.max(live.length, 1);
   useEffect(() => { if (live.length < 2) return; const timer = window.setInterval(() => setActive((value) => (value + 1) % live.length), 5500); return () => window.clearInterval(timer); }, [live.length]);
   if (!hydrated || !live.length) return null;
