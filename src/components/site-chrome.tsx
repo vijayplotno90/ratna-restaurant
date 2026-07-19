@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag, MapPin, Phone, Clock, Instagram, Facebook, Menu, X, MessageCircle, UserRound } from "lucide-react";
+import { ShoppingBag, MapPin, Phone, Clock, Instagram, Facebook, Menu, X, MessageCircle, UserRound, Crown } from "lucide-react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/ratna-logo.png";
 import { useCart } from "@/lib/cart";
@@ -9,11 +9,16 @@ export function SiteNav() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
   const [customerSignedIn, setCustomerSignedIn] = useState(false);
+  const [ownerSignedIn, setOwnerSignedIn] = useState(false);
   useEffect(() => {
-    const syncCustomer = () => setCustomerSignedIn(Boolean(sessionStorage.getItem("ratna_customer_session_v2")));
-    syncCustomer();
-    window.addEventListener("storage", syncCustomer);
-    return () => window.removeEventListener("storage", syncCustomer);
+    const syncSessions = () => {
+      setCustomerSignedIn(Boolean(sessionStorage.getItem("ratna_customer_session_v2")));
+      setOwnerSignedIn(Boolean(sessionStorage.getItem("ratna_owner_credentials")) || document.cookie.split(";").some((item) => item.trim() === "ratna_owner_session_v1=1"));
+    };
+    syncSessions();
+    window.addEventListener("storage", syncSessions);
+    window.addEventListener("ratna-session-changed", syncSessions);
+    return () => { window.removeEventListener("storage", syncSessions); window.removeEventListener("ratna-session-changed", syncSessions); };
   }, []);
   return (
     <>
@@ -42,7 +47,7 @@ export function SiteNav() {
             <NavLink to="/reserve">Reserve</NavLink>
             <NavLink to="/corporate">Corporate</NavLink>
             <NavLink to="/visit">Visit</NavLink>
-            <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />{customerSignedIn ? "My Ratna" : "Sign in"}</Link>
+            {ownerSignedIn ? <Link to="/owner" className="inline-flex items-center gap-1.5 rounded-full bg-[var(--emerald-deep)] px-3 py-2 text-sm font-semibold text-[var(--ivory)]"><Crown className="h-3.5 w-3.5 text-[var(--brass)]" />Babu · Owner</Link> : <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />{customerSignedIn ? "My Ratna" : "Sign in"}</Link>}
           </div>
 
           <div className="flex items-center gap-2">
@@ -66,7 +71,7 @@ export function SiteNav() {
               <MobileLink to="/reserve" onClick={() => setOpen(false)}>Reserve a Table</MobileLink>
               <MobileLink to="/corporate" onClick={() => setOpen(false)}>Corporate & Team Lunches</MobileLink>
               <MobileLink to="/visit" onClick={() => setOpen(false)}>Visit Us</MobileLink>
-              <MobileLink to="/account" onClick={() => setOpen(false)}>{customerSignedIn ? "My Ratna" : "Sign in"}</MobileLink>
+              <MobileLink to={ownerSignedIn ? "/owner" : "/account"} onClick={() => setOpen(false)}>{ownerSignedIn ? "Babu · Owner" : customerSignedIn ? "My Ratna" : "Sign in"}</MobileLink>
             </div>
           </div>
         )}
@@ -76,7 +81,7 @@ export function SiteNav() {
 }
 
 export function WhatsAppFloat() {
-  const num = RESTAURANT.phone.replace(/[^0-9]/g, "");
+  const num = "919398604302";
   const msg = encodeURIComponent("Hi Ratna! I'd like to pre-order / reserve a table.");
   return (
     <a
