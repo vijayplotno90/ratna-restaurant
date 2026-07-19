@@ -1,0 +1,10 @@
+{
+  "name": "Ratna Restaurant",
+  "short_name": "Ratna",
+  "description": "Order Ratna favourites, reserve a table and manage your Ratna account.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f2e5",
+  "theme_color": "#164a37",
+  "icons": [{ "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }]
+}

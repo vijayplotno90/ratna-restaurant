@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, Plus, Minus, ShoppingCart, Sparkles, Flame } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Plus, Minus, ShoppingCart, Sparkles, Flame } from "lucide-react";
 import { toast } from "sonner";
 import { SiteFooter, SiteNav } from "@/components/site-chrome";
-import { getItem, menuItems, dishUrl } from "@/data/menu";
+import { getItem, menuItems, dishUrl, nutritionFor } from "@/data/menu";
 import { useCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/dish/$id")({
@@ -28,6 +28,8 @@ function DishPage() {
   const { add } = useCart();
   const [qty, setQty] = useState(1);
   const [notes, setNotes] = useState("");
+  const [variantId, setVariantId] = useState(item?.variants?.[0]?.id ?? "");
+  const relatedScroll = useRef<HTMLDivElement>(null);
 
   if (!item) {
     return (
@@ -42,11 +44,14 @@ function DishPage() {
     );
   }
 
-  const total = item.price * qty;
+  const variant = item.variants?.find((option) => option.id === variantId);
+  const unitPrice = variant?.price ?? item.price;
+  const total = unitPrice * qty;
+  const nutrition = nutritionFor(item);
   const related = menuItems.filter((m) => m.category === item.category && m.id !== item.id).slice(0, 4);
 
   const onAdd = (goCart = false) => {
-    add({ itemId: item.id, name: item.name, image: item.image, unitPrice: item.price, qty, notes: notes.trim() || undefined });
+    add({ itemId: variant?.id ?? item.id, name: variant ? `${item.name} (${variant.label})` : item.name, image: item.image, unitPrice, qty, notes: notes.trim() || undefined });
     toast.success(`Added ${qty} × ${item.name}`);
     if (goCart) navigate({ to: "/cart" });
   };
@@ -75,6 +80,8 @@ function DishPage() {
           <h1 className="mt-3 font-serif text-5xl italic leading-tight">{item.name}</h1>
           <p className="mt-4 font-serif text-3xl text-[var(--emerald-deep)]">₹{item.price}</p>
           {item.description && <p className="mt-5 text-base leading-relaxed text-muted-foreground">{item.description}</p>}
+          {item.variants && <div className="mt-5 flex gap-2">{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-full border px-5 py-2.5 text-sm font-bold ${variantId === option.id ? "border-[var(--emerald-deep)] bg-[var(--emerald-deep)] text-white" : "border-[var(--emerald)]/25 bg-white text-[var(--emerald-deep)]"}`}>{option.label} · ₹{option.price}</button>)}</div>}
+          <div className="mt-7 rounded-2xl border border-[var(--brass)]/25 bg-[var(--ivory)] p-5"><p className="eyebrow text-[var(--emerald)]">Approximate nutrition per serving</p><div className="mt-4 grid grid-cols-4 gap-2 text-center">{[[nutrition.calories, "kcal"], [`${nutrition.protein}g`, "protein"], [`${nutrition.carbs}g`, "carbs"], [`${nutrition.fat}g`, "fat"]].map(([value, label]) => <span key={String(label)}><b className="block text-lg text-[var(--emerald-deep)]">{value}</b><small className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</small></span>)}</div><p className="mt-4 text-xs leading-relaxed text-muted-foreground">{nutrition.benefits.join(" · ")}</p></div>
 
           <div className="mt-8">
             <p className="eyebrow mb-2 text-muted-foreground">Special instructions</p>
@@ -106,9 +113,10 @@ function DishPage() {
         <section className="px-4 py-16 md:px-10">
           <div className="mx-auto max-w-7xl">
             <h2 className="font-serif text-3xl">You might also love</h2>
-            <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="mt-4 flex justify-end gap-2"><button aria-label="Previous related dish" onClick={() => relatedScroll.current?.scrollBy({ left: -260, behavior: "smooth" })} className="grid h-9 w-9 place-items-center rounded-full border"><ArrowLeft className="h-4 w-4" /></button><button aria-label="Next related dish" onClick={() => relatedScroll.current?.scrollBy({ left: 260, behavior: "smooth" })} className="grid h-9 w-9 place-items-center rounded-full bg-[var(--emerald-deep)] text-white"><ArrowRight className="h-4 w-4" /></button></div>
+            <div ref={relatedScroll} className="mt-3 flex gap-4 overflow-x-auto pb-3 no-scrollbar">
               {related.map((r) => (
-                <Link key={r.id} to="/dish/$id" params={{ id: r.id }} className="group overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition hover:-translate-y-1 hover:shadow-lg">
+                <Link key={r.id} to="/dish/$id" params={{ id: r.id }} className="group w-[220px] shrink-0 overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition hover:-translate-y-1 hover:shadow-lg">
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <img src={dishUrl(r.image)} alt={r.name} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" />
                   </div>

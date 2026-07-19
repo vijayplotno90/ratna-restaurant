@@ -11,6 +11,8 @@ export type MenuItem = {
   chefPick?: boolean;
   spicy?: 1 | 2 | 3;
   description?: string;
+  variants?: { id: string; label: string; price: number }[];
+  nutrition?: { calories: number; protein: number; carbs: number; fat: number; benefits: string[] };
 };
 
 export type Category = { id: string; title: string; subtitle: string };
@@ -57,8 +59,7 @@ export const menuItems: MenuItem[] = [
   { id: "chicken-majestic", name: "Chicken Majestic", price: 240, image: "chicken-majestic", category: "starters-nv", veg: false, popular: true, spicy: 2 },
   { id: "chicken-lollipop", name: "Chicken Lollipop", price: 240, image: "chicken-lollipop", category: "starters-nv", veg: false, popular: true },
   { id: "chicken-tikka", name: "Chicken Tikka", price: 260, image: "chicken-tikka", category: "starters-nv", veg: false, chefPick: true, description: "Boneless chicken marinated overnight in yoghurt and hand-ground tandoori masala." },
-  { id: "tandoori-chicken-half", name: "Tandoori Chicken (Half)", price: 240, halfPrice: 240, image: "tandoori-chicken", category: "starters-nv", veg: false, chefPick: true },
-  { id: "tandoori-chicken", name: "Tandoori Chicken (Full)", price: 440, image: "tandoori-chicken", category: "starters-nv", veg: false, chefPick: true, description: "Whole chicken, 24-hour marination, live charcoal tandoor." },
+  { id: "tandoori-chicken", name: "Tandoori Chicken", price: 240, image: "tandoori-chicken", category: "starters-nv", veg: false, chefPick: true, description: "24-hour yoghurt-and-spice marination, fire-roasted in our live charcoal tandoor.", variants: [{ id: "tandoori-chicken-half", label: "Half", price: 240 }, { id: "tandoori-chicken-full", label: "Full", price: 440 }], nutrition: { calories: 420, protein: 48, carbs: 8, fat: 21, benefits: ["High-protein grilled chicken", "No deep frying", "Spices add flavour without heavy sauces"] } },
   { id: "chicken-seekh", name: "Chicken Seekh Kebab", price: 260, image: "chicken-seekh-kebab", category: "starters-nv", veg: false },
   { id: "mutton-fry", name: "Mutton Fry", price: 320, image: "mutton-fry", category: "starters-nv", veg: false, spicy: 2 },
   { id: "fish-fry", name: "Fish Fry", price: 280, image: "fish-fry", category: "starters-nv", veg: false },
@@ -69,7 +70,7 @@ export const menuItems: MenuItem[] = [
   { id: "paneer-biryani", name: "Paneer Biryani", price: 220, image: "paneer-biryani", category: "biryani", veg: true },
   { id: "mushroom-biryani", name: "Mushroom Biryani", price: 210, image: "mushroom-biryani", category: "biryani", veg: true },
   { id: "kashmir-pulao", name: "Kashmir Pulao", price: 210, image: "kashmir-pulao", category: "biryani", veg: true, description: "Fragrant rice with dry fruits, saffron & mild spice." },
-  { id: "chicken-biryani", name: "Chicken Dum Biryani", price: 220, image: "chicken-dum-biryani", category: "biryani", veg: false, popular: true, chefPick: true, description: "Our signature — 4 hours of dum, aged basmati, tender chicken, saffron milk." },
+  { id: "chicken-biryani", name: "Chicken Dum Biryani", price: 220, image: "chicken-dum-biryani", category: "biryani", veg: false, popular: true, chefPick: true, description: "Our signature — 4 hours of dum, aged basmati, tender chicken, saffron milk.", nutrition: { calories: 680, protein: 31, carbs: 82, fat: 24, benefits: ["Protein from tender chicken", "Slow-cooked basmati for sustained energy", "Made fresh in a sealed handi"] } },
   { id: "chicken-fry-biryani", name: "Chicken Fry Piece Biryani", price: 260, image: "chicken-fry-piece-biryani", category: "biryani", veg: false, popular: true },
   { id: "chicken-65-biryani", name: "Chicken 65 Biryani", price: 260, image: "chicken-dum-biryani", category: "biryani", veg: false, spicy: 2 },
   { id: "mutton-biryani", name: "Mutton Dum Biryani", price: 320, image: "mutton-dum-biryani", category: "biryani", veg: false, chefPick: true, description: "Bone-in tender goat, slow-cooked handi-sealed with atta dough." },
@@ -134,6 +135,14 @@ export function getItem(id: string) {
   return menuItems.find((m) => m.id === id);
 }
 
+export function nutritionFor(item: MenuItem) {
+  if (item.nutrition) return item.nutrition;
+  if (item.category === "soups") return { calories: 150, protein: item.veg ? 5 : 10, carbs: 16, fat: 6, benefits: ["A lighter starter", "Served hot and made to order"] };
+  if (item.category === "drinks") return { calories: 140, protein: 2, carbs: 28, fat: 1, benefits: ["Refreshing accompaniment", "Best enjoyed freshly prepared"] };
+  if (item.veg) return { calories: 360, protein: 11, carbs: 42, fat: 15, benefits: ["Vegetarian choice", "Freshly prepared in our kitchen"] };
+  return { calories: 520, protein: 27, carbs: 36, fat: 26, benefits: ["Good source of protein", "Freshly prepared to order"] };
+}
+
 // Real dish photography bundled with this repository. Each menu item's `image`
 // field is a slug matching one of the JPG files under src/assets/dishes.
 import imgThali from "@/assets/dish-thali.jpg";
@@ -146,7 +155,7 @@ export function dishUrl(slug: string): string {
 }
 
 export const RESTAURANT = {
-  name: "Ratna & Ratna Deluxe",
+  name: "Ratna",
   tagline: "Multi-Cuisine Restaurant · Veg & Non-Veg · A/C",
   address: "Road No. 3, Bhagawan Colony, Chakripuram Cross Roads, Nagarjuna Nagar, Secunderabad, Telangana 500062",
   area: "Chakripuram · Kushaiguda, Hyderabad",

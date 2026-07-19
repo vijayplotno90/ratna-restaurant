@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag, MapPin, Phone, Clock, Instagram, Facebook, Menu, X, MessageCircle, UserRound, Crown } from "lucide-react";
+import { ShoppingBag, MapPin, Phone, Clock, Instagram, Facebook, Menu, X, MessageCircle, UserRound, Crown, House, Utensils } from "lucide-react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/ratna-logo.png";
 import { useCart } from "@/lib/cart";
@@ -96,6 +96,12 @@ export function WhatsAppFloat() {
     </a>
   );
 }
+
+export function MobileQuickNav() {
+  const { count } = useCart();
+  return <nav aria-label="Quick navigation" className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-[var(--brass)]/25 bg-[var(--ivory)]/95 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,.08)] backdrop-blur md:hidden"><Quick to="/" label="Home" icon={<House className="h-4 w-4" />} /><Quick to="/menu" label="Menu" icon={<Utensils className="h-4 w-4" />} /><Quick to="/cart" label={count ? `Order ${count}` : "Order"} icon={<ShoppingBag className="h-4 w-4" />} /><Quick to="/account" label="My Ratna" icon={<UserRound className="h-4 w-4" />} /></nav>;
+}
+function Quick({ to, label, icon }: { to: string; label: string; icon: React.ReactNode }) { return <Link to={to} className="flex min-w-14 flex-col items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold text-[var(--emerald-deep)]">{icon}<span>{label}</span></Link>; }
 
 function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   return (

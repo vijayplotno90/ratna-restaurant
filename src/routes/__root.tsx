@@ -7,12 +7,13 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
+import { Download, X } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/lib/cart";
 import { Toaster } from "@/components/ui/sonner";
-import { WhatsAppFloat } from "@/components/site-chrome";
+import { MobileQuickNav, WhatsAppFloat } from "@/components/site-chrome";
 import logo from "@/assets/ratna-logo.png";
 
 function NotFoundComponent() {
@@ -92,6 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", type: "image/png", href: logo },
       { rel: "apple-touch-icon", href: logo },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700;800&display=swap" },
@@ -125,8 +127,27 @@ function RootComponent() {
       <CartProvider>
         <Outlet />
         <WhatsAppFloat />
+        <MobileQuickNav />
+        <PwaInstallPrompt />
         <Toaster position="top-center" richColors />
       </CartProvider>
     </QueryClientProvider>
   );
+}
+
+function PwaInstallPrompt() {
+  const [deferred, setDeferred] = useState<any>(null);
+  const [ios, setIos] = useState(false);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+    const onInstall = (event: Event) => { event.preventDefault(); setDeferred(event); setVisible(true); };
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) && !(navigator as any).standalone;
+    setIos(isIos); if (isIos) setVisible(true);
+    window.addEventListener("beforeinstallprompt", onInstall as EventListener);
+    return () => window.removeEventListener("beforeinstallprompt", onInstall as EventListener);
+  }, []);
+  if (!visible) return null;
+  const install = async () => { if (!deferred) return; await deferred.prompt(); setVisible(false); setDeferred(null); };
+  return <aside className="fixed bottom-20 left-4 right-4 z-[60] mx-auto max-w-sm rounded-2xl border border-[var(--brass)]/35 bg-white p-4 shadow-2xl sm:left-auto"><button aria-label="Close install suggestion" onClick={() => setVisible(false)} className="absolute right-3 top-3 text-muted-foreground"><X className="h-4 w-4" /></button><div className="flex gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--emerald-deep)] text-[var(--brass)]"><Download className="h-5 w-5" /></span><div><b className="text-[var(--emerald-deep)]">Add Ratna to your phone</b><p className="mt-1 text-xs leading-relaxed text-muted-foreground">{ios ? "In Safari, tap Share, then Add to Home Screen. You can also continue using the website normally." : "Install the Ratna app for quicker ordering. The website works perfectly without installing."}</p>{deferred && <button onClick={() => void install()} className="mt-3 rounded-full bg-[var(--emerald-deep)] px-4 py-2 text-xs font-bold text-white">Install app</button>}</div></div></aside>;
 }

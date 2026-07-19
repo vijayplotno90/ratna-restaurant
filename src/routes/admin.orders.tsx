@@ -12,6 +12,7 @@ const PICKUP_STAGES: Order["status"][] = ["new", "preparing", "ready", "delivere
 const LABEL: Record<Order["status"], string> = {
   new: "New", preparing: "Preparing", ready: "Ready", out: "Out for delivery", delivered: "Delivered", cancelled: "Cancelled",
 };
+const RIDERS = ["Rafi", "Sameer", "Imran"];
 
 function OrdersPage() {
   const { list, update } = useOrders();
@@ -25,8 +26,10 @@ function OrdersPage() {
     const path = o.mode === "delivery" ? DELIVERY_STAGES : PICKUP_STAGES;
     const idx = path.indexOf(o.status);
     if (idx < 0 || idx >= path.length - 1) return;
-    update(o.id, { status: path[idx + 1] });
-    toast.success(`Moved to ${LABEL[path[idx + 1]]}`);
+    const next = path[idx + 1];
+    if (next === "out" && !o.rider) { toast.error("Assign a rider before sending this delivery out."); setSelected(o); return; }
+    update(o.id, { status: next });
+    toast.success(`Moved to ${LABEL[next]}`);
   };
 
   return (
@@ -100,8 +103,8 @@ function OrderDrawer({ order, onClose, advance, update }: { order: Order; onClos
         {order.mode === "delivery" && (
           <div className="mt-4">
             <label className="mb-1 block text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Rider</label>
-            <input value={order.rider ?? ""} onChange={(e) => update(order.id, { rider: e.target.value })} placeholder="Assign rider name"
-              className="w-full rounded-sm border border-border bg-white p-2.5 text-sm" />
+            <select value={order.rider ?? ""} onChange={(e) => { update(order.id, { rider: e.target.value || undefined }); if (e.target.value) toast.success(`${e.target.value} assigned to this delivery`); }} className="w-full rounded-sm border border-border bg-white p-2.5 text-sm"><option value="">Choose rider before dispatch</option>{RIDERS.map((rider) => <option key={rider}>{rider}</option>)}</select>
+            {order.rider && <p className="mt-2 text-xs font-semibold text-[var(--emerald)]">Assigned to {order.rider}. Ready to move to Out for delivery.</p>}
           </div>
         )}
 

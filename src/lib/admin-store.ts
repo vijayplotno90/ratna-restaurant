@@ -145,6 +145,22 @@ const minutesAgo = (minutes: number) => Date.now() - minutes * 60 * 1000;
 
 export const DEMO_ORDERS: Order[] = [
   {
+    id: "demo-1009",
+    createdAt: minutesAgo(7),
+    name: "Sana Begum",
+    phone: "9876543214",
+    mode: "delivery",
+    address: "Kapra, Hyderabad",
+    distanceKm: 5.1,
+    pay: "upi",
+    items: [{ id: "tandoori-chicken", name: "Tandoori Chicken (Half)", qty: 1, price: 240 }, { id: "butter-naan", name: "Butter Naan", qty: 2, price: 50 }],
+    subtotal: 340,
+    delivery: 0,
+    gst: 17,
+    total: 357,
+    status: "ready",
+  },
+  {
     id: "demo-1008",
     createdAt: minutesAgo(18),
     name: "Aarav Reddy",

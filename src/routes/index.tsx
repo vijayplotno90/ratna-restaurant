@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ArrowRight, Star, MapPin, Clock, Phone, Users, Utensils, Award, Flame, Sparkles, Quote, Snowflake, Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Star, MapPin, Clock, Phone, Users, Utensils, Award, Flame, Sparkles, Quote, Snowflake, Check } from "lucide-react";
 import { SiteFooter, SiteNav } from "@/components/site-chrome";
 import { menuItems, RESTAURANT, dishUrl, categories, LOCATIONS } from "@/data/menu";
 import { HomepageSpecial, useHomepageSpecials } from "@/lib/admin-store";
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const chefPicks = menuItems.filter((m) => m.chefPick).slice(0, 6);
   const legacy = chefPicks.slice(0, 4);
+  const chefScroll = useRef<HTMLDivElement>(null);
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteNav />
@@ -33,7 +34,7 @@ function HomePage() {
           <div className="text-center lg:max-w-[640px] lg:text-left">
           <p className="eyebrow text-[var(--brass)]"><span className="ornament">Kushaiguda · Hyderabad</span></p>
           <h1 className="mt-6 font-serif text-6xl leading-[0.95] md:text-8xl lg:text-9xl">
-            <span className="italic">Ratna</span> <span className="text-[var(--brass)]">&amp;</span> <span className="italic">Deluxe</span>
+            <span className="italic">Ratna</span>
           </h1>
           <div className="mx-auto mt-6 h-px w-24 bg-[var(--brass)] lg:mx-0" />
           <p className="mx-auto mt-6 max-w-xl font-serif text-xl italic text-[var(--ivory)]/85 md:text-2xl lg:mx-0">
@@ -77,7 +78,11 @@ function HomePage() {
             <h2 className="mt-3 font-serif text-4xl md:text-5xl">Chef's Selection</h2>
             <p className="mx-auto mt-3 max-w-xl text-muted-foreground">The plates our regulars come back for, and the ones our chef would order himself.</p>
           </div>
-          <div className="mt-12 flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory">
+          <div className="mt-8 flex justify-end gap-2">
+            <button aria-label="Previous chef's picks" onClick={() => chefScroll.current?.scrollBy({ left: -320, behavior: "smooth" })} className="grid h-10 w-10 place-items-center rounded-full border border-[var(--emerald)]/30 text-[var(--emerald-deep)] hover:bg-[var(--emerald-deep)] hover:text-white"><ArrowLeft className="h-4 w-4" /></button>
+            <button aria-label="Next chef's picks" onClick={() => chefScroll.current?.scrollBy({ left: 320, behavior: "smooth" })} className="grid h-10 w-10 place-items-center rounded-full bg-[var(--emerald-deep)] text-white hover:bg-[var(--emerald)]"><ArrowRight className="h-4 w-4" /></button>
+          </div>
+          <div ref={chefScroll} className="mt-4 flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
             {chefPicks.map((d) => (
               <Link key={d.id} to="/dish/$id" params={{ id: d.id }} className="group relative block w-[280px] shrink-0 snap-start overflow-hidden rounded-sm border border-[var(--brass)]/40 bg-white shadow-sm transition hover:border-[var(--emerald)] hover:shadow-lg">
                 <div className="relative aspect-[4/5] overflow-hidden">

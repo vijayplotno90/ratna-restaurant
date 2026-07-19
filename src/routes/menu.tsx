@@ -10,6 +10,7 @@ import {
   LOCATIONS,
   priceAt,
   getLocation,
+  nutritionFor,
   type MenuItem,
 } from "@/data/menu";
 import { useCart } from "@/lib/cart";
@@ -187,7 +188,9 @@ function DishRow({
 }) {
   const { add } = useCart();
   const [qty, setQty] = useState(1);
-  const price = priceAt(item.price, locId);
+  const [variantId, setVariantId] = useState(item.variants?.[0]?.id ?? "");
+  const variant = item.variants?.find((option) => option.id === variantId);
+  const price = priceAt(variant?.price ?? item.price, locId);
   return (
     <article className={`group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition lg:flex-row ${available ? "hover:shadow-md" : "opacity-60 grayscale"}`}>
       <div className="flex-1 p-5">
@@ -227,6 +230,7 @@ function DishRow({
             </span>
           )}
         </p>
+        {item.variants && <div className="mt-3 inline-flex rounded-full border border-[var(--emerald)]/25 bg-[var(--ivory)] p-1 text-xs font-bold"><span className="px-2 py-1.5 text-muted-foreground">Portion</span>{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-full px-3 py-1.5 ${variantId === option.id ? "bg-[var(--emerald-deep)] text-white" : "text-[var(--emerald-deep)]"}`}>{option.label} · ₹{priceAt(option.price, locId)}</button>)}</div>}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <button disabled={!available}
             onClick={onView}
@@ -241,8 +245,8 @@ function DishRow({
           </div>
           <button disabled={!available}
             onClick={() => {
-              add({ itemId: item.id, name: item.name, image: item.image, unitPrice: price, qty });
-              toast.success(`${qty} × ${item.name} added`);
+              add({ itemId: variant?.id ?? item.id, name: variant ? `${item.name} (${variant.label})` : item.name, image: item.image, unitPrice: price, qty });
+              toast.success(`${qty} × ${variant ? `${item.name} (${variant.label})` : item.name} added`);
             }}
             className="inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-[var(--ivory)] hover:bg-[var(--emerald)] disabled:bg-stone-400"
           >
@@ -276,7 +280,10 @@ function DishSheet({
   onClose: () => void;
 }) {
   const { add } = useCart();
-  const price = priceAt(item.price, locId);
+  const [variantId, setVariantId] = useState(item.variants?.[0]?.id ?? "");
+  const variant = item.variants?.find((option) => option.id === variantId);
+  const price = priceAt(variant?.price ?? item.price, locId);
+  const nutrition = nutritionFor(item);
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm md:items-center"
@@ -308,10 +315,13 @@ function DishSheet({
           {item.description && (
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
           )}
+          {item.variants && <div className="mt-4 flex gap-2">{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-full border px-4 py-2 text-sm font-bold ${variantId === option.id ? "border-[var(--emerald-deep)] bg-[var(--emerald-deep)] text-white" : "border-[var(--emerald)]/25"}`}>{option.label} · ₹{priceAt(option.price, locId)}</button>)}</div>}
+          <div className="mt-5 grid grid-cols-4 gap-2 rounded-2xl bg-[var(--ivory)] p-3 text-center"><Nutrition label="kcal" value={nutrition.calories} /><Nutrition label="protein" value={`${nutrition.protein}g`} /><Nutrition label="carbs" value={`${nutrition.carbs}g`} /><Nutrition label="fat" value={`${nutrition.fat}g`} /></div>
+          <p className="mt-3 text-xs text-muted-foreground">Approximate nutrition per serving. {nutrition.benefits.join(" · ")}</p>
           <button
             onClick={() => {
-              add({ itemId: item.id, name: item.name, image: item.image, unitPrice: price });
-              toast.success(`${item.name} added`);
+              add({ itemId: variant?.id ?? item.id, name: variant ? `${item.name} (${variant.label})` : item.name, image: item.image, unitPrice: price });
+              toast.success(`${variant ? `${item.name} (${variant.label})` : item.name} added`);
               onClose();
             }}
             className="mt-6 w-full rounded-full bg-[var(--emerald-deep)] py-3.5 text-sm font-bold uppercase tracking-widest text-[var(--ivory)]"
@@ -323,3 +333,5 @@ function DishSheet({
     </div>
   );
 }
+
+function Nutrition({ label, value }: { label: string; value: string | number }) { return <span><b className="block text-sm text-[var(--emerald-deep)]">{value}</b><small className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</small></span>; }
