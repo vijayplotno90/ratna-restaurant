@@ -307,3 +307,35 @@ export const ratnaCustomerOrders = createServerFn({ method: "POST" })
     if (itemsError) throw new Error(itemsError.message);
     return { orders: orders ?? [], items: items ?? [] };
   });
+
+/** Customer-only account details shown in the My Ratna area. */
+export const ratnaCustomerProfile = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => z.object({ phone: customerPhone }).parse(input))
+  .handler(async ({ data }) => {
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { data: profile, error } = await db.from("ratna_customer_profiles")
+      .select("phone, full_name, email, birthday, gender, relationship_status, important_people, important_dates, default_address, delivery_latitude, delivery_longitude, marketing_consent, notes")
+      .eq("phone", data.phone).maybeSingle();
+    if (error || !profile) throw new Error(error?.message ?? "Account profile not found");
+    return { profile };
+  });
+
+/** Lets a signed-in customer keep their delivery and celebration details current. */
+export const ratnaUpdateCustomerProfile = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => customerProfile.parse(input))
+  .handler(async ({ data }) => {
+    const { getRatnaAdminClient } = await import("@/integrations/supabase/client.server");
+    const db = getRatnaAdminClient();
+    const { error } = await db.from("ratna_customer_profiles").update({
+      full_name: data.fullName, email: data.email, birthday: data.birthday,
+      gender: data.gender, relationship_status: data.relationshipStatus,
+      important_people: data.importantPeople, important_dates: data.importantDates,
+      default_address: data.defaultAddress, delivery_latitude: data.deliveryLatitude ?? null,
+      delivery_longitude: data.deliveryLongitude ?? null, marketing_consent: data.marketingConsent,
+      notes: data.referralCode ? `Referral code: ${data.referralCode}` : null,
+      updated_at: new Date().toISOString(),
+    }).eq("phone", data.phone);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
