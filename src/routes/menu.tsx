@@ -54,19 +54,20 @@ function MenuPage() {
   return (
     <div className="public-page min-h-screen">
       <SiteNav />
-      <header className="royal-page-hero px-6 py-14 text-[var(--ivory)] md:px-10">
+      <header className="royal-page-hero px-4 py-10 text-[var(--ivory)] sm:px-6 md:px-8 md:py-14">
         <div className="mx-auto max-w-7xl text-center">
           <p className="eyebrow text-[var(--brass)]">
             <span className="ornament">Established 2004</span>
           </p>
-          <h1 className="mt-4 font-serif text-5xl italic md:text-7xl">Our Menu</h1>
+          <h1 className="mt-4 font-serif text-4xl italic sm:text-5xl md:text-6xl lg:text-7xl">Our Menu</h1>
           <p className="mx-auto mt-4 max-w-xl text-[var(--ivory)]/75">
             120+ dishes across biryani, tandoori, curries, Indo-Chinese, breads, sweets. Prices in
             ₹, taxes extra.
           </p>
 
           {/* Location switcher */}
-          <div className="mx-auto mt-8 inline-flex overflow-hidden rounded-full border border-[var(--brass)]/40 bg-black/25 p-1">
+          <div className="mx-auto mt-8 max-w-full overflow-x-auto rounded-full border border-[var(--brass)]/40 bg-black/25 p-1 no-scrollbar">
+            <div className="inline-flex min-w-max">
             {LOCATIONS.map((l) => (
               <button
                 key={l.id}
@@ -77,6 +78,7 @@ function MenuPage() {
                 {l.ac ? " · A/C" : ""}
               </button>
             ))}
+            </div>
           </div>
           <p className="mx-auto mt-3 max-w-md text-[11px] text-[var(--ivory)]/65">
             {location.tagline}
@@ -94,7 +96,7 @@ function MenuPage() {
                 className="w-full rounded-full bg-white py-3.5 pl-11 pr-4 text-sm text-foreground outline-none ring-2 ring-transparent focus:ring-[var(--brass)]"
               />
             </div>
-            <label className="flex cursor-pointer items-center gap-2 rounded-full bg-[var(--ivory)]/10 px-5 py-3 text-xs font-bold uppercase tracking-widest ring-1 ring-[var(--brass)]/30">
+            <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[var(--ivory)]/10 px-5 py-3 text-xs font-bold uppercase tracking-widest ring-1 ring-[var(--brass)]/30 sm:w-auto">
               <input
                 type="checkbox"
                 checked={vegOnly}
@@ -107,8 +109,8 @@ function MenuPage() {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-8 px-4 py-10 md:px-8">
-        <aside className="hidden w-60 shrink-0 md:block">
+      <div className="mx-auto flex max-w-7xl gap-8 px-4 py-7 sm:px-6 md:py-10 lg:px-8">
+        <aside className="hidden w-60 shrink-0 lg:block">
           <div className="sticky top-28">
             <p className="eyebrow mb-4 text-muted-foreground">Sections</p>
             <ul className="space-y-1">
@@ -133,7 +135,7 @@ function MenuPage() {
           </div>
         </aside>
 
-        <div className="sticky top-[104px] z-30 -mx-4 mb-4 flex gap-2 overflow-x-auto border-b border-border bg-[var(--ivory)]/95 px-4 py-3 no-scrollbar backdrop-blur md:hidden">
+        <div className="sticky top-[104px] z-30 -mx-4 mb-4 flex gap-2 overflow-x-auto border-b border-border bg-[var(--ivory)]/95 px-4 py-3 no-scrollbar backdrop-blur lg:hidden sm:-mx-6 sm:px-6">
           {categories.map((c) => (
             <button
               key={c.id}
@@ -160,7 +162,7 @@ function MenuPage() {
           {filtered.length === 0 ? (
             <p className="text-muted-foreground">No dishes found. Try clearing filters.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
               {filtered.map((m) => (
                 <DishRow key={m.id} item={m} locId={locId} available={availability.map[m.id]?.available !== false} onView={() => setDetail(m)} />
               ))}
@@ -192,7 +194,7 @@ function DishRow({
   const variant = item.variants?.find((option) => option.id === variantId);
   const price = priceAt(variant?.price ?? item.price, locId);
   return (
-    <article className={`group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition lg:flex-row ${available ? "hover:shadow-md" : "opacity-60 grayscale"}`}>
+    <article className={`group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition xl:flex-row ${available ? "hover:shadow-md" : "opacity-60 grayscale"}`}>
       <div className="flex-1 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <span
@@ -238,7 +240,7 @@ function DishRow({
           >
             Details
           </button>
-          <div className="ml-auto inline-flex items-center overflow-hidden rounded-full border border-[var(--emerald)]/25 bg-white" aria-label={`Quantity for ${item.name}`}>
+          <div className="inline-flex items-center overflow-hidden rounded-full border border-[var(--emerald)]/25 bg-white sm:ml-auto" aria-label={`Quantity for ${item.name}`}>
             <button type="button" disabled={!available || qty <= 1} onClick={() => setQty((value) => Math.max(1, value - 1))} className="grid h-8 w-8 place-items-center text-[var(--emerald-deep)] disabled:opacity-35" aria-label="Decrease quantity"><Minus className="h-3.5 w-3.5" /></button>
             <input type="number" min="1" max="99" value={qty} disabled={!available} onChange={(event) => setQty(Math.min(99, Math.max(1, Number(event.target.value) || 1)))} className="h-8 w-9 border-x border-[var(--emerald)]/15 bg-transparent text-center text-xs font-bold outline-none disabled:opacity-40" aria-label="Quantity" />
             <button type="button" disabled={!available || qty >= 99} onClick={() => setQty((value) => Math.min(99, value + 1))} className="grid h-8 w-8 place-items-center text-[var(--emerald-deep)] disabled:opacity-35" aria-label="Increase quantity"><Plus className="h-3.5 w-3.5" /></button>
@@ -257,7 +259,7 @@ function DishRow({
       <Link
         to="/dish/$id"
         params={{ id: item.id }}
-        className="relative aspect-[16/9] w-full shrink-0 overflow-hidden lg:aspect-square lg:w-40"
+        className="relative aspect-[16/9] w-full shrink-0 overflow-hidden xl:aspect-square xl:w-40"
       >
         <img
           src={dishUrl(item.image)}

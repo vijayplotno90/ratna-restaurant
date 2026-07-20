@@ -41,7 +41,7 @@ export function SiteNav() {
             </span>
           </Link>
 
-          <div className="hidden items-center gap-9 md:flex">
+          <div className="hidden items-center gap-9 lg:flex">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/menu">Menu</NavLink>
             <NavLink to="/reserve">Reserve</NavLink>
@@ -58,13 +58,13 @@ export function SiteNav() {
                 <span className="ml-0.5 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[var(--brass)] px-1 text-[11px] font-bold text-[var(--emerald-deep)]">{count}</span>
               )}
             </Link>
-            <button onClick={() => setOpen((o) => !o)} className="grid h-10 w-10 place-items-center rounded-full border border-border md:hidden" aria-label="Menu">
+            <button onClick={() => setOpen((o) => !o)} className="grid h-10 w-10 place-items-center rounded-full border border-border lg:hidden" aria-label="Menu">
               {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
           </div>
         </div>
         {open && (
-          <div className="border-t border-border bg-[var(--ivory)] px-4 py-4 md:hidden">
+          <div className="border-t border-border bg-[var(--ivory)] px-4 py-4 lg:hidden">
             <div className="flex flex-col gap-3">
               <MobileLink to="/" onClick={() => setOpen(false)}>Home</MobileLink>
               <MobileLink to="/menu" onClick={() => setOpen(false)}>Menu</MobileLink>
@@ -99,7 +99,7 @@ export function WhatsAppFloat() {
 
 export function MobileQuickNav() {
   const { count } = useCart();
-  return <nav aria-label="Quick navigation" className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-[var(--brass)]/25 bg-[var(--ivory)]/95 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,.08)] backdrop-blur md:hidden"><Quick to="/" label="Home" icon={<House className="h-4 w-4" />} /><Quick to="/menu" label="Menu" icon={<Utensils className="h-4 w-4" />} /><Quick to="/cart" label={count ? `Order ${count}` : "Order"} icon={<ShoppingBag className="h-4 w-4" />} /><Quick to="/account" label="My Ratna" icon={<UserRound className="h-4 w-4" />} /></nav>;
+  return <nav aria-label="Quick navigation" className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-[var(--brass)]/25 bg-[var(--ivory)]/95 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,.08)] backdrop-blur lg:hidden"><Quick to="/" label="Home" icon={<House className="h-4 w-4" />} /><Quick to="/menu" label="Menu" icon={<Utensils className="h-4 w-4" />} /><Quick to="/cart" label={count ? `Order ${count}` : "Order"} icon={<ShoppingBag className="h-4 w-4" />} /><Quick to="/account" label="My Ratna" icon={<UserRound className="h-4 w-4" />} /></nav>;
 }
 function Quick({ to, label, icon }: { to: string; label: string; icon: React.ReactNode }) { return <Link to={to} className="flex min-w-14 flex-col items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold text-[var(--emerald-deep)]">{icon}<span>{label}</span></Link>; }
 

@@ -148,7 +148,7 @@
     -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4, h5 { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.01em; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; max-width: 100%; overflow-x: clip; }
 }
 
 @utility eyebrow {
@@ -185,8 +185,8 @@
 }
 .animate-marquee { animation: marquee 40s linear infinite; }
 
-@media (max-width: 767px) {
-  body { padding-bottom: 4.5rem; }
+@media (max-width: 1023px) {
+  body { padding-bottom: 4.5rem; max-width: 100%; overflow-x: clip; }
   .public-page { overflow-x: clip; }
 }
 
