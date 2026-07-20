@@ -109,7 +109,7 @@ function MenuPage() {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-8 px-4 py-7 sm:px-6 md:py-10 lg:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-7 sm:px-6 md:py-10 lg:flex-row lg:gap-8 lg:px-8">
         <aside className="hidden w-60 shrink-0 lg:block">
           <div className="sticky top-28">
             <p className="eyebrow mb-4 text-muted-foreground">Sections</p>
