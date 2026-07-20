@@ -45,7 +45,7 @@ export function SiteNav() {
             <NavLink to="/">Home</NavLink>
             <NavLink to="/menu">Menu</NavLink>
             <NavLink to="/reserve">Reserve</NavLink>
-            <NavLink to="/corporate">Corporate</NavLink>
+            <NavLink to="/corporate">Celebrate</NavLink>
             <NavLink to="/visit">Visit</NavLink>
             {ownerSignedIn ? <Link to="/owner" className="inline-flex items-center gap-1.5 rounded-full bg-[var(--emerald-deep)] px-3 py-2 text-sm font-semibold text-[var(--ivory)]"><Crown className="h-3.5 w-3.5 text-[var(--brass)]" />Babu · Owner</Link> : <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />{customerSignedIn ? "My Ratna" : "Sign in"}</Link>}
           </div>
@@ -69,7 +69,7 @@ export function SiteNav() {
               <MobileLink to="/" onClick={() => setOpen(false)}>Home</MobileLink>
               <MobileLink to="/menu" onClick={() => setOpen(false)}>Menu</MobileLink>
               <MobileLink to="/reserve" onClick={() => setOpen(false)}>Reserve a Table</MobileLink>
-              <MobileLink to="/corporate" onClick={() => setOpen(false)}>Corporate & Team Lunches</MobileLink>
+              <MobileLink to="/corporate" onClick={() => setOpen(false)}>Celebrations & Gatherings</MobileLink>
               <MobileLink to="/visit" onClick={() => setOpen(false)}>Visit Us</MobileLink>
               <MobileLink to={ownerSignedIn ? "/owner" : "/account"} onClick={() => setOpen(false)}>{ownerSignedIn ? "Babu · Owner" : customerSignedIn ? "My Ratna" : "Sign in"}</MobileLink>
             </div>

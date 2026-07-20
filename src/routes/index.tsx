@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Ratna & Ratna Deluxe — Multi-Cuisine Restaurant, Kushaiguda" },
-      { name: "description", content: "Since 2004 — Hyderabadi dum biryani, tandoori, Indo-Chinese and sweets. Two dining halls: Ratna (walk-in) and Ratna Deluxe (full A/C). Reservations & team lunches at Chakripuram, Kushaiguda." },
+      { name: "description", content: "Since 2004 — Hyderabadi dum biryani, tandoori, Indo-Chinese and sweets. Two dining halls: Ratna (walk-in) and Ratna Deluxe (full A/C). Reservations, celebrations and group gatherings at Chakripuram, Kushaiguda." },
       { property: "og:image", content: heroInterior },
     ],
   }),
@@ -203,19 +203,19 @@ function HomePage() {
       <section className="bg-white px-6 py-20 md:px-10">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 md:grid-cols-2">
           <div className="order-2 md:order-1">
-            <p className="eyebrow text-[var(--emerald)]">Corporate & team lunches</p>
-            <h2 className="mt-3 font-serif text-4xl md:text-5xl leading-tight">Book the room. We'll handle the rest.</h2>
+            <p className="eyebrow text-[var(--emerald)]">Celebrations & gatherings</p>
+            <h2 className="mt-3 font-serif text-4xl md:text-5xl leading-tight">Bring your people. We'll set the table.</h2>
             <p className="mt-5 text-muted-foreground leading-relaxed">
-              A/C deluxe hall for up to 120. Set menus for teams of 8 to 80. Silent takeaway packs for the office. Ratna Deluxe has been the go-to for company off-sites, team lunches and family functions in Kushaiguda for two decades.
+              A/C deluxe hall for up to 120. Birthdays, anniversaries, friends' reunions, a baby celebration, family lunches and team meals — Ratna has been part of Kushaiguda's happiest tables for two decades.
             </p>
             <ul className="mt-6 space-y-2.5 text-sm">
-              {["Curated 3-course & thali set menus from ₹399/head", "Reserved sections, projector & AV on request", "Silent bulk-order packs for office deliveries", "Dedicated coordinator for groups of 20+"].map((s) => (
+              {["Curated celebration feasts from ₹399/head", "Reserved sections and A/C deluxe seating", "Cake-cutting and surprise-sweet help on request", "A Ratna host for groups of 20+"].map((s) => (
                 <li key={s} className="flex items-start gap-2"><span className="mt-1.5 h-1 w-3 shrink-0 bg-[var(--brass)]" /> {s}</li>
               ))}
             </ul>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/corporate" className="inline-flex items-center gap-2 rounded-full bg-[var(--emerald)] px-7 py-3 text-sm font-bold uppercase tracking-widest text-[var(--ivory)] hover:bg-[var(--emerald-deep)]">
-                Plan a team lunch
+                Plan a gathering
               </Link>
               <a href={`tel:${RESTAURANT.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 rounded-full border border-[var(--emerald)]/30 px-7 py-3 text-sm font-bold uppercase tracking-widest text-[var(--emerald-deep)] hover:bg-secondary">
                 <Phone className="h-4 w-4" /> Call the manager
@@ -224,7 +224,7 @@ function HomePage() {
           </div>
           <div className="order-1 md:order-2">
             <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-[var(--brass)]/25">
-              <img src={teamDinner} alt="Corporate dinner at Ratna Deluxe" className="h-full w-full object-cover" loading="lazy" />
+              <img src={teamDinner} alt="Friends and family gathering at Ratna" className="h-full w-full object-cover" loading="lazy" />
             </div>
           </div>
         </div>
