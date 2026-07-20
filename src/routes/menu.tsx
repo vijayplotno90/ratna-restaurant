@@ -7,9 +7,6 @@ import {
   menuItems,
   categories,
   dishUrl,
-  LOCATIONS,
-  priceAt,
-  getLocation,
   nutritionFor,
   type MenuItem,
 } from "@/data/menu";
@@ -19,11 +16,11 @@ import { useOverrides } from "@/lib/admin-store";
 export const Route = createFileRoute("/menu")({
   head: () => ({
     meta: [
-      { title: "Menu — Ratna Deluxe" },
+      { title: "Menu — Ratna" },
       {
         name: "description",
         content:
-          "Full menu of Ratna Deluxe, Kushaiguda — biryani, tandoori, curries, Indo-Chinese, breads, desserts and drinks. Veg & non-veg.",
+          "Full online menu of Ratna, Kushaiguda — biryani, tandoori, curries, Indo-Chinese, breads, desserts and drinks. Veg & non-veg.",
       },
     ],
   }),
@@ -35,8 +32,6 @@ function MenuPage() {
   const [search, setSearch] = useState("");
   const [vegOnly, setVegOnly] = useState(false);
   const [detail, setDetail] = useState<MenuItem | null>(null);
-  const [locId, setLocId] = useState<"ratna" | "deluxe">("ratna");
-  const location = getLocation(locId);
   const availability = useOverrides();
 
   const filtered = useMemo(() => {
@@ -65,28 +60,11 @@ function MenuPage() {
             ₹, taxes extra.
           </p>
 
-          {/* Location switcher */}
-          <div className="mx-auto mt-8 max-w-full overflow-x-auto rounded-full border border-[var(--brass)]/40 bg-black/25 p-1 no-scrollbar">
-            <div className="inline-flex min-w-max">
-            {LOCATIONS.map((l) => (
-              <button
-                key={l.id}
-                onClick={() => setLocId(l.id)}
-                className={`rounded-full px-5 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition ${locId === l.id ? "bg-[var(--brass)] text-[var(--emerald-deep)]" : "text-[var(--ivory)]/75 hover:text-[var(--ivory)]"}`}
-              >
-                {l.name}
-                {l.ac ? " · A/C" : ""}
-              </button>
-            ))}
-            </div>
-          </div>
-          <p className="mx-auto mt-3 max-w-md text-[11px] text-[var(--ivory)]/65">
-            {location.tagline}
-            {location.priceMultiplier > 1 &&
-              ` · +${Math.round((location.priceMultiplier - 1) * 100)}% A/C service on menu prices`}
+          <p className="mx-auto mt-5 max-w-md text-[11px] uppercase tracking-[0.16em] text-[var(--brass)]">
+            One Ratna kitchen · one menu · the same food at home
           </p>
 
-          <div className="mx-auto mt-8 flex max-w-xl flex-wrap items-center gap-3">
+          <div className="mx-auto mt-7 flex max-w-xl flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/50" />
               <input
@@ -164,14 +142,14 @@ function MenuPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
               {filtered.map((m) => (
-                <DishRow key={m.id} item={m} locId={locId} available={availability.map[m.id]?.available !== false} onView={() => setDetail(m)} />
+                <DishRow key={m.id} item={m} available={availability.map[m.id]?.available !== false} onView={() => setDetail(m)} />
               ))}
             </div>
           )}
         </main>
       </div>
 
-      {detail && <DishSheet item={detail} locId={locId} onClose={() => setDetail(null)} />}
+      {detail && <DishSheet item={detail} onClose={() => setDetail(null)} />}
       <SiteFooter />
     </div>
   );
@@ -179,12 +157,10 @@ function MenuPage() {
 
 function DishRow({
   item,
-  locId,
   available,
   onView,
 }: {
   item: MenuItem;
-  locId: "ratna" | "deluxe";
   available: boolean;
   onView: () => void;
 }) {
@@ -192,7 +168,7 @@ function DishRow({
   const [qty, setQty] = useState(1);
   const [variantId, setVariantId] = useState(item.variants?.[0]?.id ?? "");
   const variant = item.variants?.find((option) => option.id === variantId);
-  const price = priceAt(variant?.price ?? item.price, locId);
+  const price = variant?.price ?? item.price;
   return (
     <article className={`group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition xl:flex-row ${available ? "hover:shadow-md" : "opacity-60 grayscale"}`}>
       <div className="flex-1 p-5">
@@ -232,7 +208,7 @@ function DishRow({
             </span>
           )}
         </p>
-        {item.variants && <div className="mt-3 inline-flex rounded-full border border-[var(--emerald)]/25 bg-[var(--ivory)] p-1 text-xs font-bold"><span className="px-2 py-1.5 text-muted-foreground">Portion</span>{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-full px-3 py-1.5 ${variantId === option.id ? "bg-[var(--emerald-deep)] text-white" : "text-[var(--emerald-deep)]"}`}>{option.label} · ₹{priceAt(option.price, locId)}</button>)}</div>}
+        {item.variants && <div className="mt-3 inline-flex rounded-full border border-[var(--emerald)]/25 bg-[var(--ivory)] p-1 text-xs font-bold"><span className="px-2 py-1.5 text-muted-foreground">Portion</span>{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-full px-3 py-1.5 ${variantId === option.id ? "bg-[var(--emerald-deep)] text-white" : "text-[var(--emerald-deep)]"}`}>{option.label} · ₹{option.price}</button>)}</div>}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <button disabled={!available}
             onClick={onView}
@@ -274,17 +250,15 @@ function DishRow({
 
 function DishSheet({
   item,
-  locId,
   onClose,
 }: {
   item: MenuItem;
-  locId: "ratna" | "deluxe";
   onClose: () => void;
 }) {
   const { add } = useCart();
   const [variantId, setVariantId] = useState(item.variants?.[0]?.id ?? "");
   const variant = item.variants?.find((option) => option.id === variantId);
-  const price = priceAt(variant?.price ?? item.price, locId);
+  const price = variant?.price ?? item.price;
   const nutrition = nutritionFor(item);
   return (
     <div
@@ -317,7 +291,7 @@ function DishSheet({
           {item.description && (
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
           )}
-          {item.variants && <div className="mt-4 flex gap-2">{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-full border px-4 py-2 text-sm font-bold ${variantId === option.id ? "border-[var(--emerald-deep)] bg-[var(--emerald-deep)] text-white" : "border-[var(--emerald)]/25"}`}>{option.label} · ₹{priceAt(option.price, locId)}</button>)}</div>}
+          {item.variants && <div className="mt-4 flex gap-2">{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-full border px-4 py-2 text-sm font-bold ${variantId === option.id ? "border-[var(--emerald-deep)] bg-[var(--emerald-deep)] text-white" : "border-[var(--emerald)]/25"}`}>{option.label} · ₹{option.price}</button>)}</div>}
           <div className="mt-5 grid grid-cols-4 gap-2 rounded-2xl bg-[var(--ivory)] p-3 text-center"><Nutrition label="kcal" value={nutrition.calories} /><Nutrition label="protein" value={`${nutrition.protein}g`} /><Nutrition label="carbs" value={`${nutrition.carbs}g`} /><Nutrition label="fat" value={`${nutrition.fat}g`} /></div>
           <p className="mt-3 text-xs text-muted-foreground">Approximate nutrition per serving. {nutrition.benefits.join(" · ")}</p>
           <button
