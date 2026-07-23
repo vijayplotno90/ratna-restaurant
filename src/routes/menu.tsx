@@ -49,7 +49,7 @@ function MenuPage() {
   return (
     <div className="public-page min-h-screen">
       <SiteNav />
-      <header className="royal-page-hero px-4 py-10 text-[var(--ivory)] sm:px-6 md:px-8 md:py-14">
+      <header className="royal-page-hero hidden px-4 py-10 text-[var(--ivory)] sm:px-6 md:block md:px-8 md:py-14">
         <div className="mx-auto max-w-7xl text-center">
           <p className="eyebrow text-[var(--brass)]">
             <span className="ornament">Established 2004</span>
@@ -87,7 +87,27 @@ function MenuPage() {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-7 sm:px-6 md:py-10 lg:flex-row lg:gap-8 lg:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 md:py-10 lg:flex-row lg:gap-8 lg:px-8">
+        <div className="flex items-center gap-2 md:hidden">
+          <div className="relative min-w-0 flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/50" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search dishes…"
+              className="w-full rounded-full border border-[var(--brass)]/25 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-[var(--brass)]/50"
+            />
+          </div>
+          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-[var(--brass)]/30 bg-white px-3 py-2.5 text-[11px] font-bold uppercase tracking-wide text-[var(--emerald-deep)]">
+            <input
+              type="checkbox"
+              checked={vegOnly}
+              onChange={(e) => setVegOnly(e.target.checked)}
+              className="h-3.5 w-3.5 accent-green-600"
+            />
+            <Leaf className="h-3.5 w-3.5" /> Veg
+          </label>
+        </div>
         <aside className="hidden w-60 shrink-0 lg:block">
           <div className="sticky top-28">
             <p className="eyebrow mb-4 text-muted-foreground">Sections</p>
