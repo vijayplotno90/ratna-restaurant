@@ -113,33 +113,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* STORY STRIP */}
-      <section className="border-b border-[var(--brass)]/20 bg-[var(--ivory)] px-6 py-16 md:px-10">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
-          <div>
-            <p className="eyebrow text-[var(--emerald)]">Est. 2004</p>
-            <h2 className="mt-3 font-serif text-4xl md:text-5xl leading-tight">A Hyderabadi table with room for everyone.</h2>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              Ratna Deluxe has been the neighbourhood's dependable dinner spot for two decades. Families, colleagues, celebrations — we host all of them, seven days a week, from noon until late.
-            </p>
-            <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              Our biryani rice is aged basmati, slow-cooked in a sealed copper handi. Our tandoor runs on live charcoal from dusk. And there is always something for the vegetarian at the table.
-            </p>
-            <Link to="/menu" className="mt-8 inline-flex items-center gap-2 font-serif text-lg italic text-[var(--emerald)] underline decoration-[var(--brass)] decoration-2 underline-offset-4 hover:text-[var(--emerald-deep)]">
-              See the full menu <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Stat n={`${new Date().getFullYear() - RESTAURANT.established}+`} label="Years serving" />
-            <Stat n={`${(RESTAURANT.reviews / 1000).toFixed(1)}k`} label="Ratings" />
-            <Stat n={`${RESTAURANT.seats}+`} label="Seats" />
-            <Stat n="120+" label="Dishes" />
-            <Stat n="7" label="Days a week" />
-            <Stat n="A/C" label="Deluxe hall" />
-          </div>
-        </div>
-      </section>
-
       {/* TWO RATNAS */}
       <section className="border-b border-[var(--brass)]/20 bg-white px-6 py-20 md:px-10">
         <div className="mx-auto max-w-6xl">
@@ -376,14 +349,6 @@ function specialPriority(item: HomepageSpecial, weekday: number) {
   return 5;
 }
 
-function Stat({ n, label }: { n: string; label: string }) {
-  return (
-    <div className="rounded-sm border border-[var(--brass)]/25 bg-white p-5 text-center">
-      <p className="font-serif text-3xl italic text-[var(--emerald)]">{n}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">{label}</p>
-    </div>
-  );
-}
 function VegDot({ veg, className = "" }: { veg: boolean; className?: string }) {
   return (
     <span className={`inline-block h-4 w-4 rounded-sm border-2 ${veg ? "border-green-600" : "border-red-600"} bg-white p-px ${className}`}>

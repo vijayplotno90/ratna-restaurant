@@ -140,7 +140,7 @@ function MenuPage() {
           {filtered.length === 0 ? (
             <p className="text-muted-foreground">No dishes found. Try clearing filters.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
               {filtered.map((m) => (
                 <DishRow key={m.id} item={m} available={availability.map[m.id]?.available !== false} onView={() => setDetail(m)} />
               ))}
@@ -171,36 +171,36 @@ function DishRow({
   const price = variant?.price ?? item.price;
   return (
     <article className={`group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition xl:flex-row ${available ? "hover:shadow-md" : "opacity-60 grayscale"}`}>
-      <div className="flex-1 p-5">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex-1 p-3 sm:p-4 xl:p-5">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <span
-            className={`inline-block h-3.5 w-3.5 rounded-sm border-2 ${item.veg ? "border-green-600" : "border-red-600"} bg-white p-px`}
+            className={`inline-block h-3 w-3 rounded-sm border-2 sm:h-3.5 sm:w-3.5 ${item.veg ? "border-green-600" : "border-red-600"} bg-white p-px`}
           >
             <span
               className={`block h-full w-full rounded-full ${item.veg ? "bg-green-600" : "bg-red-600"}`}
             />
           </span>
           {item.chefPick && (
-            <span className="rounded-full bg-[var(--brass)]/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[var(--emerald-deep)]">
+            <span className="rounded-full bg-[var(--brass)]/20 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[var(--emerald-deep)] sm:px-2 sm:text-[9px] sm:tracking-widest">
               Chef's Pick
             </span>
           )}
           {item.popular && !item.chefPick && (
-            <span className="rounded-full bg-[var(--emerald)]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[var(--emerald-deep)]">
+            <span className="rounded-full bg-[var(--emerald)]/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[var(--emerald-deep)] sm:px-2 sm:text-[9px] sm:tracking-widest">
               Popular
             </span>
           )}
           {item.spicy && <span className="text-[10px]">{"🌶".repeat(item.spicy)}</span>}
         </div>
         <Link to="/dish/$id" params={{ id: item.id }}>
-          <h3 className="mt-2 font-serif text-xl leading-tight hover:text-[var(--emerald)]">
+          <h3 className="mt-1.5 line-clamp-2 min-h-10 font-serif text-base leading-tight hover:text-[var(--emerald)] sm:text-lg xl:mt-2 xl:min-h-0 xl:text-xl">
             {item.name}
           </h3>
         </Link>
         {item.description && (
-          <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
+          <p className="mt-1.5 hidden line-clamp-2 text-xs text-muted-foreground xl:block">{item.description}</p>
         )}
-        <p className="mt-3 font-serif text-lg italic text-[var(--emerald-deep)]">
+        <p className="mt-2 font-serif text-base italic text-[var(--emerald-deep)] sm:text-lg xl:mt-3">
           ₹{price}
           {price !== item.price && (
             <span className="ml-2 text-[11px] not-italic text-muted-foreground line-through">
@@ -208,25 +208,25 @@ function DishRow({
             </span>
           )}
         </p>
-        {item.variants && <div className="mt-3 inline-flex rounded-full border border-[var(--emerald)]/25 bg-[var(--ivory)] p-1 text-xs font-bold"><span className="px-2 py-1.5 text-muted-foreground">Portion</span>{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-full px-3 py-1.5 ${variantId === option.id ? "bg-[var(--emerald-deep)] text-white" : "text-[var(--emerald-deep)]"}`}>{option.label} · ₹{option.price}</button>)}</div>}
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        {item.variants && <div className="mt-2 inline-flex max-w-full flex-wrap rounded-xl border border-[var(--emerald)]/25 bg-[var(--ivory)] p-1 text-[10px] font-bold sm:text-xs xl:mt-3"><span className="hidden px-2 py-1.5 text-muted-foreground xl:inline">Portion</span>{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-lg px-2 py-1 ${variantId === option.id ? "bg-[var(--emerald-deep)] text-white" : "text-[var(--emerald-deep)]"}`}>{option.label} · ₹{option.price}</button>)}</div>}
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-1.5 xl:mt-3 xl:gap-2">
           <button disabled={!available}
             onClick={onView}
-            className="text-[11px] font-semibold uppercase tracking-widest text-[var(--emerald-deep)] underline decoration-[var(--brass)] underline-offset-4"
+            className="hidden text-[11px] font-semibold uppercase tracking-widest text-[var(--emerald-deep)] underline decoration-[var(--brass)] underline-offset-4 sm:inline"
           >
             Details
           </button>
           <div className="inline-flex items-center overflow-hidden rounded-full border border-[var(--emerald)]/25 bg-white sm:ml-auto" aria-label={`Quantity for ${item.name}`}>
-            <button type="button" disabled={!available || qty <= 1} onClick={() => setQty((value) => Math.max(1, value - 1))} className="grid h-8 w-8 place-items-center text-[var(--emerald-deep)] disabled:opacity-35" aria-label="Decrease quantity"><Minus className="h-3.5 w-3.5" /></button>
-            <input type="number" min="1" max="99" value={qty} disabled={!available} onChange={(event) => setQty(Math.min(99, Math.max(1, Number(event.target.value) || 1)))} className="h-8 w-9 border-x border-[var(--emerald)]/15 bg-transparent text-center text-xs font-bold outline-none disabled:opacity-40" aria-label="Quantity" />
-            <button type="button" disabled={!available || qty >= 99} onClick={() => setQty((value) => Math.min(99, value + 1))} className="grid h-8 w-8 place-items-center text-[var(--emerald-deep)] disabled:opacity-35" aria-label="Increase quantity"><Plus className="h-3.5 w-3.5" /></button>
+            <button type="button" disabled={!available || qty <= 1} onClick={() => setQty((value) => Math.max(1, value - 1))} className="grid h-7 w-7 place-items-center text-[var(--emerald-deep)] disabled:opacity-35 sm:h-8 sm:w-8" aria-label="Decrease quantity"><Minus className="h-3 w-3 sm:h-3.5 sm:w-3.5" /></button>
+            <input type="number" min="1" max="99" value={qty} disabled={!available} onChange={(event) => setQty(Math.min(99, Math.max(1, Number(event.target.value) || 1)))} className="h-7 w-7 border-x border-[var(--emerald)]/15 bg-transparent text-center text-[10px] font-bold outline-none disabled:opacity-40 sm:h-8 sm:w-9 sm:text-xs" aria-label="Quantity" />
+            <button type="button" disabled={!available || qty >= 99} onClick={() => setQty((value) => Math.min(99, value + 1))} className="grid h-7 w-7 place-items-center text-[var(--emerald-deep)] disabled:opacity-35 sm:h-8 sm:w-8" aria-label="Increase quantity"><Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" /></button>
           </div>
           <button disabled={!available}
             onClick={() => {
               add({ itemId: variant?.id ?? item.id, name: variant ? `${item.name} (${variant.label})` : item.name, image: item.image, unitPrice: price, qty });
               toast.success(`${qty} × ${variant ? `${item.name} (${variant.label})` : item.name} added`);
             }}
-            className="inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-[var(--ivory)] hover:bg-[var(--emerald)] disabled:bg-stone-400"
+            className="inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-[var(--ivory)] hover:bg-[var(--emerald)] disabled:bg-stone-400 sm:px-4 sm:py-2 sm:text-[11px] sm:tracking-widest"
           >
             <ShoppingBag className="h-3.5 w-3.5" /> {available ? "Add" : "Sold out"}
           </button>
@@ -235,7 +235,7 @@ function DishRow({
       <Link
         to="/dish/$id"
         params={{ id: item.id }}
-        className="relative aspect-[16/9] w-full shrink-0 overflow-hidden xl:aspect-square xl:w-40"
+        className="relative aspect-video w-full shrink-0 overflow-hidden xl:aspect-square xl:w-40"
       >
         <img
           src={dishUrl(item.image)}
