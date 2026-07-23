@@ -47,7 +47,7 @@ export function SiteNav() {
             <NavLink to="/reserve">Reserve</NavLink>
             <NavLink to="/corporate">Celebrate</NavLink>
             <NavLink to="/visit">Visit</NavLink>
-            {ownerSignedIn ? <Link to="/owner" className="inline-flex items-center gap-1.5 rounded-full bg-[var(--emerald-deep)] px-3 py-2 text-sm font-semibold text-[var(--ivory)]"><Crown className="h-3.5 w-3.5 text-[var(--brass)]" />Babu · Owner</Link> : <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />{customerSignedIn ? "My Ratna" : "Sign in"}</Link>}
+            {ownerSignedIn ? <Link to="/owner" className="inline-flex items-center gap-1.5 rounded-full bg-[var(--emerald-deep)] px-3 py-2 text-sm font-semibold text-[var(--ivory)]"><Crown className="h-3.5 w-3.5 text-[var(--brass)]" />Babu · Owner</Link> : <Link to="/account" className="inline-flex items-center gap-1.5 rounded-full border border-[var(--emerald)]/25 px-3 py-2 text-sm font-semibold text-[var(--emerald-deep)]"><UserRound className="h-3.5 w-3.5" />{customerSignedIn ? "Account" : "Sign in"}</Link>}
           </div>
 
           <div className="flex items-center gap-2">
@@ -71,7 +71,7 @@ export function SiteNav() {
               <MobileLink to="/reserve" onClick={() => setOpen(false)}>Reserve a Table</MobileLink>
               <MobileLink to="/corporate" onClick={() => setOpen(false)}>Celebrations & Gatherings</MobileLink>
               <MobileLink to="/visit" onClick={() => setOpen(false)}>Visit Us</MobileLink>
-              <MobileLink to={ownerSignedIn ? "/owner" : "/account"} onClick={() => setOpen(false)}>{ownerSignedIn ? "Babu · Owner" : customerSignedIn ? "My Ratna" : "Sign in"}</MobileLink>
+              <MobileLink to={ownerSignedIn ? "/owner" : "/account"} onClick={() => setOpen(false)}>{ownerSignedIn ? "Babu · Owner" : customerSignedIn ? "Account" : "Sign in"}</MobileLink>
             </div>
           </div>
         )}
@@ -89,17 +89,17 @@ export function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
-      className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3.5 text-sm font-bold text-white shadow-xl ring-4 ring-[#25D366]/20 transition hover:scale-105 hover:bg-[#1ebe57]"
+      title="WhatsApp Ratna"
+      className="fixed bottom-24 right-4 z-30 grid h-11 w-11 place-items-center rounded-full bg-[#25D366] text-white shadow-lg ring-4 ring-[#25D366]/20 transition hover:scale-105 hover:bg-[#1ebe57] lg:bottom-5 lg:right-5"
     >
-      <MessageCircle className="h-5 w-5" />
-      <span className="hidden sm:inline">WhatsApp us</span>
+      <MessageCircle className="h-5 w-5" aria-hidden="true" />
     </a>
   );
 }
 
 export function MobileQuickNav() {
   const { count } = useCart();
-  return <nav aria-label="Quick navigation" className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-[var(--brass)]/25 bg-[var(--ivory)]/95 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,.08)] backdrop-blur lg:hidden"><Quick to="/" label="Home" icon={<House className="h-4 w-4" />} /><Quick to="/menu" label="Menu" icon={<Utensils className="h-4 w-4" />} /><Quick to="/cart" label={count ? `Order ${count}` : "Order"} icon={<ShoppingBag className="h-4 w-4" />} /><Quick to="/account" label="My Ratna" icon={<UserRound className="h-4 w-4" />} /></nav>;
+  return <nav aria-label="Quick navigation" className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-[var(--brass)]/25 bg-[var(--ivory)]/95 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,.08)] backdrop-blur lg:hidden"><Quick to="/" label="Home" icon={<House className="h-4 w-4" />} /><Quick to="/menu" label="Menu" icon={<Utensils className="h-4 w-4" />} /><Quick to="/cart" label={count ? `Order ${count}` : "Order"} icon={<ShoppingBag className="h-4 w-4" />} /><Quick to="/account" label="Account" icon={<UserRound className="h-4 w-4" />} /></nav>;
 }
 function Quick({ to, label, icon }: { to: string; label: string; icon: React.ReactNode }) { return <Link to={to} className="flex min-w-14 flex-col items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold text-[var(--emerald-deep)]">{icon}<span>{label}</span></Link>; }
 
