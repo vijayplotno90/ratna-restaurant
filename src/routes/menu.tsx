@@ -171,7 +171,7 @@ function DishRow({
   const price = variant?.price ?? item.price;
   return (
     <article className={`group flex flex-col-reverse overflow-hidden rounded-sm border border-[var(--brass)]/20 bg-white transition xl:flex-row ${available ? "hover:shadow-md" : "opacity-60 grayscale"}`}>
-      <div className="flex-1 p-3 sm:p-4 xl:p-5">
+      <div className="flex-1 p-2.5 sm:p-4 xl:p-5">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <span
             className={`inline-block h-3 w-3 rounded-sm border-2 sm:h-3.5 sm:w-3.5 ${item.veg ? "border-green-600" : "border-red-600"} bg-white p-px`}
@@ -193,7 +193,7 @@ function DishRow({
           {item.spicy && <span className="text-[10px]">{"🌶".repeat(item.spicy)}</span>}
         </div>
         <Link to="/dish/$id" params={{ id: item.id }}>
-          <h3 className="mt-1.5 line-clamp-2 min-h-10 font-serif text-base leading-tight hover:text-[var(--emerald)] sm:text-lg xl:mt-2 xl:min-h-0 xl:text-xl">
+          <h3 className="mt-1.5 line-clamp-2 min-h-9 font-serif text-[15px] leading-tight hover:text-[var(--emerald)] sm:text-lg xl:mt-2 xl:min-h-0 xl:text-xl">
             {item.name}
           </h3>
         </Link>
@@ -209,7 +209,7 @@ function DishRow({
           )}
         </p>
         {item.variants && <div className="mt-2 inline-flex max-w-full flex-wrap rounded-xl border border-[var(--emerald)]/25 bg-[var(--ivory)] p-1 text-[10px] font-bold sm:text-xs xl:mt-3"><span className="hidden px-2 py-1.5 text-muted-foreground xl:inline">Portion</span>{item.variants.map((option) => <button key={option.id} onClick={() => setVariantId(option.id)} className={`rounded-lg px-2 py-1 ${variantId === option.id ? "bg-[var(--emerald-deep)] text-white" : "text-[var(--emerald-deep)]"}`}>{option.label} · ₹{option.price}</button>)}</div>}
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-1.5 xl:mt-3 xl:gap-2">
+        <div className="mt-1.5 flex flex-nowrap items-center justify-between gap-1 xl:mt-3 xl:flex-wrap xl:gap-2">
           <button disabled={!available}
             onClick={onView}
             className="hidden text-[11px] font-semibold uppercase tracking-widest text-[var(--emerald-deep)] underline decoration-[var(--brass)] underline-offset-4 sm:inline"
@@ -217,16 +217,16 @@ function DishRow({
             Details
           </button>
           <div className="inline-flex items-center overflow-hidden rounded-full border border-[var(--emerald)]/25 bg-white sm:ml-auto" aria-label={`Quantity for ${item.name}`}>
-            <button type="button" disabled={!available || qty <= 1} onClick={() => setQty((value) => Math.max(1, value - 1))} className="grid h-7 w-7 place-items-center text-[var(--emerald-deep)] disabled:opacity-35 sm:h-8 sm:w-8" aria-label="Decrease quantity"><Minus className="h-3 w-3 sm:h-3.5 sm:w-3.5" /></button>
-            <input type="number" min="1" max="99" value={qty} disabled={!available} onChange={(event) => setQty(Math.min(99, Math.max(1, Number(event.target.value) || 1)))} className="h-7 w-7 border-x border-[var(--emerald)]/15 bg-transparent text-center text-[10px] font-bold outline-none disabled:opacity-40 sm:h-8 sm:w-9 sm:text-xs" aria-label="Quantity" />
-            <button type="button" disabled={!available || qty >= 99} onClick={() => setQty((value) => Math.min(99, value + 1))} className="grid h-7 w-7 place-items-center text-[var(--emerald-deep)] disabled:opacity-35 sm:h-8 sm:w-8" aria-label="Increase quantity"><Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" /></button>
+            <button type="button" disabled={!available || qty <= 1} onClick={() => setQty((value) => Math.max(1, value - 1))} className="grid h-6 w-6 place-items-center text-[var(--emerald-deep)] disabled:opacity-35 sm:h-8 sm:w-8" aria-label="Decrease quantity"><Minus className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" /></button>
+            <input type="number" min="1" max="99" value={qty} disabled={!available} onChange={(event) => setQty(Math.min(99, Math.max(1, Number(event.target.value) || 1)))} className="h-6 w-6 border-x border-[var(--emerald)]/15 bg-transparent text-center text-[9px] font-bold outline-none disabled:opacity-40 sm:h-8 sm:w-9 sm:text-xs" aria-label="Quantity" />
+            <button type="button" disabled={!available || qty >= 99} onClick={() => setQty((value) => Math.min(99, value + 1))} className="grid h-6 w-6 place-items-center text-[var(--emerald-deep)] disabled:opacity-35 sm:h-8 sm:w-8" aria-label="Increase quantity"><Plus className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" /></button>
           </div>
           <button disabled={!available}
             onClick={() => {
               add({ itemId: variant?.id ?? item.id, name: variant ? `${item.name} (${variant.label})` : item.name, image: item.image, unitPrice: price, qty });
               toast.success(`${qty} × ${variant ? `${item.name} (${variant.label})` : item.name} added`);
             }}
-            className="inline-flex items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-[var(--ivory)] hover:bg-[var(--emerald)] disabled:bg-stone-400 sm:px-4 sm:py-2 sm:text-[11px] sm:tracking-widest"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--emerald-deep)] px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-[var(--ivory)] hover:bg-[var(--emerald)] disabled:bg-stone-400 sm:px-4 sm:py-2 sm:text-[11px] sm:tracking-widest"
           >
             <ShoppingBag className="h-3.5 w-3.5" /> {available ? "Add" : "Sold out"}
           </button>
@@ -235,7 +235,7 @@ function DishRow({
       <Link
         to="/dish/$id"
         params={{ id: item.id }}
-        className="relative aspect-video w-full shrink-0 overflow-hidden xl:aspect-square xl:w-40"
+        className="relative aspect-[2/1] w-full shrink-0 overflow-hidden xl:aspect-square xl:w-40"
       >
         <img
           src={dishUrl(item.image)}
